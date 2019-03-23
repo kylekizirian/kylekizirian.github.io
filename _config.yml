@@ -37,12 +37,14 @@ projects:
   # youtube: your_username
 
 topics:
-  - name: CSS
-    web_url: https://github.com/topics/css
-    image_url: https://raw.githubusercontent.com/github/explore/6c6508f34230f0ac0d49e847a326429eefbfc030/topics/css/css.png
+  - name: Continuous Integration
+    web_url: https://github.com/topics/continuous-integration
+    image_url: https://camo.githubusercontent.com/c631a8cd2a842be7d1da89f3dcac4c42375f794d/687474703a2f2f6a656e6b696e732d782e696f2f696d672f70726f66696c652e706e67
 
-  - name: Web design
+  - name: Python
+    web_url: https://github.com/topics/python
+    image_url: https://raw.githubusercontent.com/github/explore/6c6508f34230f0ac0d49e847a326429eefbfc030/topics/python/python.png
 
-  - name: Sass
-    web_url: https://github.com/topics/sass
-    image_url: https://raw.githubusercontent.com/github/explore/6c6508f34230f0ac0d49e847a326429eefbfc030/topics/sass/sass.png
+  - name: Testing
+    web_url: https://github.com/topics/testing
+    image_url: https://avatars1.githubusercontent.com/ml/671?s=140&v=4
