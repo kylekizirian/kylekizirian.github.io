@@ -1149,13 +1149,16 @@ h6:hover .anchor-link {
 .highlight .il { color: #666666 } /* Literal.Number.Integer.Long */</style><div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="problem6">problem6<a class="anchor-link" href="#problem6">&#182;</a></h1><p>This post is inspired by <a href="https://www.youtube.com/watch?v=OkmNXy7er84&amp;t=1s">Grant Sanderson's awesome 3blue1brown video</a> which looks at question A6 on the <a href="http://www.math.hawaii.edu/~dale/putnam/1992.pdf">1992 Putnam</a></p>
-<p>The question is</p>
-<blockquote><p>Four points are chosen independently and at random on the surface of a sphere (using the uniform distribution). What is the probability that the center of the sphere lies inside the resulting tetrahedron?</p>
+<h1 id="problem6">problem6<a class="anchor-link" href="#problem6">&#182;</a></h1><blockquote><p>Four points are chosen independently and at random on the surface of a sphere (using the uniform distribution). What is the probability that the center of the sphere lies inside the resulting tetrahedron?</p>
 </blockquote>
-<p>The video is brilliant and contains fascinating insight as to how one might have reached the solution. Before reading any further, I highly recommend watching the video because, as Grant points out, the problem solving process is far more interesting than the result and Grant does an incredible job of illuminating how to approach such a problem.</p>
-<p>I was so intrigued by the problem that I wanted to take a stab at it myself with a different approach, by running a large number of random simulations and counting our results.</p>
-<p><em>Note</em>: this has been done before in <a href="https://towardsdatascience.com/a-simple-monte-carlo-simulation-to-solve-a-putnam-competition-math-problem-28545df6562d">this excellent Medium post</a>, we'll do things slightly differently in a few places so both posts are well worth the read!</p>
+<p>This is question A6 on the <a href="http://www.math.hawaii.edu/~dale/putnam/1992.pdf">1992 Putnam</a> collegiate math competition and is explored brilliantly in <a href="https://www.youtube.com/watch?v=OkmNXy7er84&amp;t=1s">Grant Sanderson's awesome 3blue1brown video</a>. I find this question to be a lot of fun for two reasons</p>
+<ol>
+<li>Despite being one of the more difficult questions on one of the hardest math tests in the world, it's easy to understand what the question is asking.</li>
+<li>At first glance, I don't have the faintest idea of what the answer might be or how I'd figure it out.</li>
+</ol>
+<p>This post is completely inspired by Grant's video which contains fascinating insight as to how one might have reached the solution. Before reading any further, I highly recommend watching the video because, as Grant points out, the problem solving process is far more interesting than the result and Grant does an incredible job of illuminating this.</p>
+<p>In the problem solving spirit, I wanted to take a stab at the question myself with a slightly different approach, by running a sufficiently large number of random simulations and counting the results.</p>
+<p><em>Note</em>: this has been done before in <a href="https://towardsdatascience.com/a-simple-monte-carlo-simulation-to-solve-a-putnam-competition-math-problem-28545df6562d">this excellent Medium post</a>, I'll do things slightly differently in a few places so both posts are well worth the read!</p>
 
 </div>
 </div>
@@ -1163,8 +1166,8 @@ h6:hover .anchor-link {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="How-to-check-if-a-point-is-enclosed-within-a-tetrahedron?">How to check if a point is enclosed within a tetrahedron?<a class="anchor-link" href="#How-to-check-if-a-point-is-enclosed-within-a-tetrahedron?">&#182;</a></h2><p>To check whether a point (in our case, the sphere's center) is enclosed within a tetrahedron, we'll use a generalized version of the method described <a href="http://steve.hollasch.net/cgindex/geometry/ptintet.html">here</a>.</p>
-<p>We'll start with the slightly simpler 2D case. This method extends to many dimensions but, in two dimensions, it looks like the following:</p>
+<h2 id="How-to-check-if-a-point-is-enclosed-within-a-tetrahedron?">How to check if a point is enclosed within a tetrahedron?<a class="anchor-link" href="#How-to-check-if-a-point-is-enclosed-within-a-tetrahedron?">&#182;</a></h2><p>With a bit of linear algebra, this turns out to be relatively straightforward. The three dimensional case, in which a point in 3D space is enclosed within a tetrahedron, is described <a href="http://steve.hollasch.net/cgindex/geometry/ptintet.html">here</a>, but the same method extends just as well to any dimension.</p>
+<p>The slightly simpler two dimensional case looks like the following:</p>
 <p>Given a triangle's vertices and a point $p$</p>
 <p>$v1 = (x_1, y_1)$</p>
 <p>$v2 = (x_2, y_2)$</p>
@@ -1203,7 +1206,7 @@ D_3 =
   x_p &amp; y_p &amp; 1
  \end{pmatrix}
 $</p>
-<p>With a little help from numpy, it's easy enough to implement a function that takes a point and a list of vertices and returns whether the point is enclosed in the shape formed by the given vertices.</p>
+<p>With a little help from numpy, this is easy enough to implement in a function that takes a point and a list of vertices and returns whether the sign of the determinant of all of the above matrices are the same.</p>
 
 </div>
 </div>
@@ -1261,7 +1264,7 @@ $</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Testing-Our-Implementation">Testing Our Implementation<a class="anchor-link" href="#Testing-Our-Implementation">&#182;</a></h2><p>Let's test our implementation by creating a right triangle with vertices $(0, 0)$, $(1, 0)$, and $(0, 1)$ and test that the point $(0.2, 0.2)$ is contained within our triangle while the point $(0.6, 0.6)$ is not.</p>
+<h2 id="A-simple-test">A simple test<a class="anchor-link" href="#A-simple-test">&#182;</a></h2><p>Let's test this implementation by creating a right triangle with the vertices $(0, 0)$, $(1, 0)$, and $(0, 1)$ and verify that the point $(0.2, 0.2)$ is contained within the triangle while the point $(0.6, 0.6)$ is not.</p>
 
 </div>
 </div>
@@ -1292,7 +1295,8 @@ $</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Generating-a-Random-Point-with-Unit-Length">Generating a Random Point with Unit Length<a class="anchor-link" href="#Generating-a-Random-Point-with-Unit-Length">&#182;</a></h2><p>In order to generate random points on the unit circle or unit sphere, we'll need to generate random vectors with length one. We can generate random vectors with unit length by creating a vector of random numbers and dividing by the vector's norm.</p>
+<h2 id="Generating-a-random-point-on-the-unit-sphere">Generating a random point on the unit sphere<a class="anchor-link" href="#Generating-a-random-point-on-the-unit-sphere">&#182;</a></h2><p>Looks good! Next comes the "four points are chosen independently and at random on the surface of a sphere" part of the problem. Random points on the unit circle or unit sphere can be represented as vectors with unit length<sup>1</sup>. Generating a random vector with unit length simply involves generating a vector of random numbers, then dividing each of the vector's elements by its length so that the length becomes one.</p>
+<p><em>1</em>. More precisely, when talking about length we mean the vector's <a href="http://mathworld.wolfram.com/L2-Norm.html">Euclidean norm</a>.</p>
 
 </div>
 </div>
@@ -1320,8 +1324,11 @@ $</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Helper-Classes">Helper Classes<a class="anchor-link" href="#Helper-Classes">&#182;</a></h2><p>We'll create two classes that will help us in writing cleaner, more pythonic code for running the simulation. First, we'll create a <code>Point</code> class that <a href="https://docs.scipy.org/doc/numpy/user/basics.subclassing.html">subclasses numpy.ndarray</a>, but adds the attributes <code>x</code>, <code>y</code>, and <code>z</code>.</p>
-<p>Additionally, we'll create a <code>Triangle</code> class that takes the three vertices that form the triangle and implements the magic <code>__contains__</code> method, allowing us to write statements like <code>point in triangle</code> to check whether a 2D point is enclosed within the triangle.</p>
+<h2 id="Helper-classes">Helper classes<a class="anchor-link" href="#Helper-classes">&#182;</a></h2><p>Two classes will help in writing cleaner, more pythonic code for running the simulation. First, a <code>Point</code> class that <a href="https://docs.scipy.org/doc/numpy/user/basics.subclassing.html">subclasses numpy.ndarray</a>, but adds the attributes <code>x</code>, <code>y</code>, and <code>z</code>.</p>
+<p>Additionally, a <code>Triangle</code> class that takes the three vertices that form the triangle and implements the magic <code>__contains__</code> method, providing the ability to write statements like</p>
+<div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">triangle</span><span class="p">:</span>
+    <span class="n">num_points_enclosed</span> <span class="o">+=</span> <span class="mi">1</span>
+</pre></div>
 
 </div>
 </div>
@@ -1392,7 +1399,7 @@ $</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Visualizing-our-2D-implementation">Visualizing our 2D implementation<a class="anchor-link" href="#Visualizing-our-2D-implementation">&#182;</a></h2><p>Here, it'll help us to stop and visualize what we've implemented so far to verify that all looks good. We'll visualize the problem in 2D by generating three random points on the unit circle, drawing the triangle that it forms, and coloring the triangle blue if the origin is enclosed in the triangle or red in the case that it's not. Visualizing this should give us some confidence that our helper classes and impelementation of <code>contains</code> looks correct.</p>
+<h2 id="Visualizing-the-2D-implementation">Visualizing the 2D implementation<a class="anchor-link" href="#Visualizing-the-2D-implementation">&#182;</a></h2><p>Here, it'll help to stop and visualize what's been implemented so far to verify that all looks good. It's useful to visualize the problem in 2D by generating three random points on the unit circle, drawing the triangle that it forms, and coloring the triangle blue if the origin is enclosed in the triangle or red in the case that it's not. Visualizing this should provide some confidence that the <code>Point</code> class, <code>Triangle</code> class, and the <code>contains</code> function all look correct.</p>
 
 </div>
 </div>
@@ -1516,7 +1523,7 @@ $</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Running-the-simulation">Running the simulation<a class="anchor-link" href="#Running-the-simulation">&#182;</a></h2><p>So far so good! We're ready to run our simulation, we'll generate 10,000 triangles and count the number of times that the origin is enclosed within our random triangle.</p>
+<h2 id="Running-the-simulation">Running the simulation<a class="anchor-link" href="#Running-the-simulation">&#182;</a></h2><p>So far so good! We're ready to run the simulation by generating 10,000 triangles and counting the number of times that the origin is enclosed within our random triangle.</p>
 
 </div>
 </div>
@@ -1572,7 +1579,7 @@ $</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Simulating-the-3D-Case">Simulating the 3D Case<a class="anchor-link" href="#Simulating-the-3D-Case">&#182;</a></h2><p>The 3D case follows closely from the 2D case, we'll create a <code>Tetrahedron</code> class that mirrors our <code>Triangle</code> class but with four vertices in three dimensions. Then, we're ready to simulate the creation of 10,000 tetrahedrons and check the number of times that the origin is enclosed.</p>
+<h2 id="Simulating-the-3D-case">Simulating the 3D case<a class="anchor-link" href="#Simulating-the-3D-case">&#182;</a></h2><p>The 3D case follows closely from the 2D case with a <code>Tetrahedron</code> class that mirrors the <code>Triangle</code> class but with four vertices in three dimensions. With this, we're ready to simulate the creation of 10,000 tetrahedrons and check the number of times that the origin is enclosed.</p>
 
 </div>
 </div>
@@ -1660,9 +1667,9 @@ $</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Additional-Resources">Additional Resources<a class="anchor-link" href="#Additional-Resources">&#182;</a></h2><p>If this post was interesting at all, I can hardly say enough good things about the entire <a href="https://www.youtube.com/channel/UCYO_jab_esuFRV4b17AJtAw">3blue1brown channel</a> which does an amazing job of providing intuitive visual explanations for challenging concepts. Of particular relevance to this post is a great explanation on <a href="https://www.youtube.com/watch?v=Ip3X9LOh2dk">the determinant</a>.</p>
+<h2 id="Additional-resources">Additional resources<a class="anchor-link" href="#Additional-resources">&#182;</a></h2><p>Tada! If this post was interesting at all, I can hardly say enough good things about the entire <a href="https://www.youtube.com/channel/UCYO_jab_esuFRV4b17AJtAw">3blue1brown channel</a> which does an amazing job of providing intuitive visual explanations for challenging concepts. Of particular relevance to this post is a great explanation on <a href="https://www.youtube.com/watch?v=Ip3X9LOh2dk">the determinant</a>.</p>
 <p>I've also recently discovered <a href="https://jeremykun.com/">Jeremy Kun's awesome blog</a> which has nice primers on different areas of mathematics. Jeremy's book, <a href="https://pimbook.org/">A Programmer's Introduction to Mathematics</a>, is on my reading list.</p>
-<p>Finally, I struggled mightily with linear algebra throughout school until a friend of mine in grad school recommended Gilbert Strang's <a href="http://math.mit.edu/~gs/linearalgebra/">books</a> and <a href="https://ocw.mit.edu/courses/mathematics/18-06-linear-algebra-spring-2010/">lectures</a> which helped me a ton with gaining an inuitive understanding of linear algebra concepts.</p>
+<p>Finally, I struggled with linear algebra throughout school until a friend of mine in grad school recommended Gilbert Strang's <a href="http://math.mit.edu/~gs/linearalgebra/">books</a> and <a href="https://ocw.mit.edu/courses/mathematics/18-06-linear-algebra-spring-2010/">lectures</a> which helped me a ton with gaining an inuitive understanding of linear algebra concepts.</p>
 
 </div>
 </div>
