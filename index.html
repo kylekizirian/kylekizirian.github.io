@@ -1151,7 +1151,7 @@ h6:hover .anchor-link {
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="problem6">problem6<a class="anchor-link" href="#problem6">&#182;</a></h1><blockquote><p>Four points are chosen independently and at random on the surface of a sphere (using the uniform distribution). What is the probability that the center of the sphere lies inside the resulting tetrahedron?</p>
 </blockquote>
-<p>This is question A6 on the <a href="http://www.math.hawaii.edu/~dale/putnam/1992.pdf">1992 Putnam</a> collegiate math competition and is explored brilliantly in <a href="https://www.youtube.com/watch?v=OkmNXy7er84&amp;t=1s">Grant Sanderson's awesome 3blue1brown video</a>. I find this question to be a lot of fun for two reasons</p>
+<p>This is question A6 on the <a href="http://www.math.hawaii.edu/~dale/putnam/1992.pdf">1992 Putnam</a> collegiate math competition and is explored brilliantly in <a href="https://www.youtube.com/watch?v=OkmNXy7er84&amp;t=1s">Grant Sanderson's awesome 3blue1brown video</a>. I find this question to be a lot of fun for two reasons:</p>
 <ol>
 <li>Despite being one of the more difficult questions on one of the hardest math tests in the world, it's easy to understand what the question is asking.</li>
 <li>At first glance, I don't have the faintest idea of what the answer might be or how I'd figure it out.</li>
@@ -1173,7 +1173,7 @@ h6:hover .anchor-link {
 <p>$v2 = (x_2, y_2)$</p>
 <p>$v3 = (x_3, y_3)$</p>
 <p>$p = (x_p, y_p)$</p>
-<p>The point $p$ is contained within the triangle if the sign of the determinant of all of the following matrices are the same</p>
+<p>The point $p$ is contained within the triangle if the sign of the determinant of all of the following matrices are the same:</p>
 <p>$
 D_0 = 
  \begin{pmatrix}
@@ -1325,7 +1325,7 @@ $</p>
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Helper-classes">Helper classes<a class="anchor-link" href="#Helper-classes">&#182;</a></h2><p>Two classes will help in writing cleaner, more pythonic code for running the simulation. First, a <code>Point</code> class that <a href="https://docs.scipy.org/doc/numpy/user/basics.subclassing.html">subclasses numpy.ndarray</a>, but adds the attributes <code>x</code>, <code>y</code>, and <code>z</code>.</p>
-<p>Additionally, a <code>Triangle</code> class that takes the three vertices that form the triangle and implements the magic <code>__contains__</code> method, providing the ability to write statements like</p>
+<p>Additionally, a <code>Triangle</code> class that takes the three vertices that form the triangle and implements the magic <code>__contains__</code> method, providing the ability to write statements like:</p>
 <div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">triangle</span><span class="p">:</span>
     <span class="n">num_points_enclosed</span> <span class="o">+=</span> <span class="mi">1</span>
 </pre></div>
@@ -2855,7 +2855,7 @@ h6:hover .anchor-link {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Testing-Our-Partition-Function-for-Correctness">Testing Our Partition Function for Correctness<a class="anchor-link" href="#Testing-Our-Partition-Function-for-Correctness">&#182;</a></h2><p>The Online Encyclopedia of Integer Sequences (<a href="http://oeis.org/A000041">OEIS A000041</a>) gives P(n) for n=0...49 which we will use for testing our implementation of P(n).</p>
+<h2 id="Testing-Our-Partition-Function-for-Correctness">Testing Our Partition Function for Correctness<a class="anchor-link" href="#Testing-Our-Partition-Function-for-Correctness">&#182;</a></h2><p>The Online Encyclopedia of Integer Sequences (<a href="http://oeis.org/A000041">OEIS A000041</a>) gives P(n) for n=0..49 which we will use for testing our implementation of P(n).</p>
 <p>Our test function will take a function, P(n), which in turn takes a single integer argument. The test function will iterate over the list of known P(n) from OEIS above and assert that calling our function returns the correct value.</p>
 
 </div>
@@ -2894,7 +2894,7 @@ h6:hover .anchor-link {
 <h2 id="Implementing-P(n)">Implementing P(n)<a class="anchor-link" href="#Implementing-P(n)">&#182;</a></h2><p>Figure 11 in the <a href="http://mathworld.wolfram.com/PartitionFunctionP.html">MathWorld reference on Partition Function P</a> gives P(n) as</p>
 <p>$P(n) = \sum_{k=1}^{n} (-1)^{k+1}[P(n - \frac{1}{2}k(3k-1))+P(n - \frac{1}{2}k(3k+1))]$</p>
 <p>This recurrence equation is naturally expressed as a recursive function with a base case of P(0) = 1</p>
-<p>Let's look first at an implementation that most closely resembles the the function above</p>
+<p>Let's look first at an implementation that most closely resembles the function above</p>
 
 </div>
 </div>
@@ -3313,7 +3313,7 @@ Wall time: 9.15 ms
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>One interesting thing we will notice right away is that P(n) is called 1,001,001 times while pow() is called only 500,500 times even though pow() should be called n times for each call to P(n). This is because the the terms $n - \frac{1}{2}k(3k-1)$ and $n - \frac{1}{2}k(3k+1)$ frequently evaluate to negative numbers, in which case the summation loop is bypassed and 0 is returned.</p>
+<p>One interesting thing we will notice right away is that P(n) is called 1,001,001 times while pow() is called only 500,500 times even though pow() should be called n times for each call to P(n). This is because the terms $n - \frac{1}{2}k(3k-1)$ and $n - \frac{1}{2}k(3k+1)$ frequently evaluate to negative numbers, in which case the summation loop is bypassed and 0 is returned.</p>
 <p>Because function calls in Python are expensive, it would be better to simply replace the term with 0 rather than call P(n) with n &lt; 0. The implementation below first calculates the terms $n - \frac{1}{2}k(3k-1)$ and $n - \frac{1}{2}k(3k+1)$ and replaces the respective P(n) terms with 0 if they are negative.</p>
 
 </div>
@@ -3455,7 +3455,7 @@ Wall time: 9.15 ms
 <h2 id="Examining-Calls-to-pow()">Examining Calls to pow()<a class="anchor-link" href="#Examining-Calls-to-pow()">&#182;</a></h2><p>From our profiling metrics above, we see that our calls to pow() are now taking up nearly half of our execution time. Re-examining our function, we can take a second look at the term $(-1)^{k+1}$</p>
 <p>$P(n) = \sum_{k=1}^{n} (-1)^{k+1}[P(n - \frac{1}{2}k(3k-1))+P(n - \frac{1}{2}k(3k+1))]$</p>
 <p>Careful consideration will show us that the purpose of the term $(-1)^{k+1}$ is that we will subtract the intermediate result when k is even and add the intermediate result when k is odd. That is, $(-1)^{k+1}$ evaluates to -1 when k is even and to +1 when k is odd.</p>
-<p>If we simply want to know whether k is odd or even in order to add or subtract our intermediate result, we can do this more quickly with the modulus operator than by computing $(-1)^{k+1}$. Let us analyze this by taking a random positive integer under 1000 and comparing the time to calculate $pow(-1,\ random\_num)$ and $random\_num\ \%\ 2$.</p>
+<p>If we simply want to know whether k is odd or even in order to add or subtract our intermediate result, we can do this more quickly with the modulus operator than by computing $(-1)^{k+1}$. Let us analyze this by taking a random positive integer under 1000 and comparing the time to calculate <code>pow(-1, random_num)</code> and <code>random_num % 2</code>.</p>
 
 </div>
 </div>
@@ -3541,7 +3541,7 @@ Wall time: 9.15 ms
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>As we can see, $random\_num\ \%\ 2$ is roughly an order of magnitude faster than $pow(-1,\ random\_num)$. Let us go back and replace the term $(-1)^{k+1}$ with the use of a modulus operator to govern whether we add or subtract the intermediate result.</p>
+<p>As we can see, <code>random_num % 2</code> is roughly an order of magnitude faster than <code>pow(-1, random_num)</code>. Let us go back and replace the term $(-1)^{k+1}$ with the use of a modulus operator to govern whether we add or subtract the intermediate result.</p>
 
 </div>
 </div>
@@ -3673,7 +3673,7 @@ Wall time: 9.15 ms
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Once again, we see a nearly 2x speed-up by eliminating the 500,500 function calls to pow(), with all remaining calls now being the recursive calls to P(n).</p>
+<p>Once again, we see a nearly 2x speed-up by eliminating the 500,500 function calls to <code>pow()</code>, with all remaining calls now being the recursive calls to P(n).</p>
 
 </div>
 </div>

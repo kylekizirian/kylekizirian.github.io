@@ -1153,7 +1153,7 @@ h6:hover .anchor-link {
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="problem6">problem6<a class="anchor-link" href="#problem6">&#182;</a></h1><blockquote><p>Four points are chosen independently and at random on the surface of a sphere (using the uniform distribution). What is the probability that the center of the sphere lies inside the resulting tetrahedron?</p>
 </blockquote>
-<p>This is question A6 on the <a href="http://www.math.hawaii.edu/~dale/putnam/1992.pdf">1992 Putnam</a> collegiate math competition and is explored brilliantly in <a href="https://www.youtube.com/watch?v=OkmNXy7er84&amp;t=1s">Grant Sanderson's awesome 3blue1brown video</a>. I find this question to be a lot of fun for two reasons</p>
+<p>This is question A6 on the <a href="http://www.math.hawaii.edu/~dale/putnam/1992.pdf">1992 Putnam</a> collegiate math competition and is explored brilliantly in <a href="https://www.youtube.com/watch?v=OkmNXy7er84&amp;t=1s">Grant Sanderson's awesome 3blue1brown video</a>. I find this question to be a lot of fun for two reasons:</p>
 <ol>
 <li>Despite being one of the more difficult questions on one of the hardest math tests in the world, it's easy to understand what the question is asking.</li>
 <li>At first glance, I don't have the faintest idea of what the answer might be or how I'd figure it out.</li>
@@ -1175,7 +1175,7 @@ h6:hover .anchor-link {
 <p>$v2 = (x_2, y_2)$</p>
 <p>$v3 = (x_3, y_3)$</p>
 <p>$p = (x_p, y_p)$</p>
-<p>The point $p$ is contained within the triangle if the sign of the determinant of all of the following matrices are the same</p>
+<p>The point $p$ is contained within the triangle if the sign of the determinant of all of the following matrices are the same:</p>
 <p>$
 D_0 = 
  \begin{pmatrix}
@@ -1327,7 +1327,7 @@ $</p>
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Helper-classes">Helper classes<a class="anchor-link" href="#Helper-classes">&#182;</a></h2><p>Two classes will help in writing cleaner, more pythonic code for running the simulation. First, a <code>Point</code> class that <a href="https://docs.scipy.org/doc/numpy/user/basics.subclassing.html">subclasses numpy.ndarray</a>, but adds the attributes <code>x</code>, <code>y</code>, and <code>z</code>.</p>
-<p>Additionally, a <code>Triangle</code> class that takes the three vertices that form the triangle and implements the magic <code>__contains__</code> method, providing the ability to write statements like</p>
+<p>Additionally, a <code>Triangle</code> class that takes the three vertices that form the triangle and implements the magic <code>__contains__</code> method, providing the ability to write statements like:</p>
 <div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">triangle</span><span class="p">:</span>
     <span class="n">num_points_enclosed</span> <span class="o">+=</span> <span class="mi">1</span>
 </pre></div>
