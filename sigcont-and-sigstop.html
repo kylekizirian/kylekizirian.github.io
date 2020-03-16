@@ -1282,10 +1282,10 @@ pauses for a two second gap, then runs for two more seconds.</p>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>85887: 1584317646.599296
-85887: 1584317647.6032739
-85887: 1584317650.5725708
-85887: 1584317651.574015
+<pre>1416: 1584328282.3045828
+1416: 1584328283.304825
+1416: 1584328286.266311
+1416: 1584328287.269263
 </pre>
 </div>
 </div>
@@ -1313,7 +1313,7 @@ execution time and none of the programs run concurrently.</p>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">processes</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="n">Popen</span><span class="p">([</span><span class="s2">&quot;python&quot;</span><span class="p">,</span> <span class="s2">&quot;print_time.py&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;8&quot;</span><span class="p">],</span> <span class="n">stdout</span><span class="o">=</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+    <span class="n">Popen</span><span class="p">([</span><span class="s2">&quot;python&quot;</span><span class="p">,</span> <span class="s2">&quot;print_time.py&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;7&quot;</span><span class="p">],</span> <span class="n">stdout</span><span class="o">=</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 <span class="p">]</span>
 <span class="k">for</span> <span class="n">process</span> <span class="ow">in</span> <span class="n">processes</span><span class="p">:</span>
@@ -1413,19 +1413,18 @@ switching to a different process.</p>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>85888: 1584317652.730904
-85888: 1584317653.731411
-85889: 1584317654.723969
-85889: 1584317655.7270458
-85890: 1584317656.732857
-85890: 1584317657.7348201
-85888: 1584317658.693002
-85888: 1584317659.693248
-85889: 1584317660.693377
-85889: 1584317661.698638
-85890: 1584317662.693693
-85890: 1584317663.694156
-85890: 1584317668.701111
+<pre>1417: 1584328288.389765
+1417: 1584328289.389979
+1418: 1584328290.388866
+1418: 1584328291.3892632
+1419: 1584328292.398747
+1419: 1584328293.4039948
+1417: 1584328294.359136
+1417: 1584328295.3628201
+1418: 1584328296.361504
+1418: 1584328297.3635771
+1419: 1584328298.366812
+1419: 1584328299.372034
 </pre>
 </div>
 </div>
