@@ -3,7 +3,7 @@
 <head>
         <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Kizirian | Finding the greatest common divisor in two lines</title>
+    <title>Kizirian | Investigating Python's history from the shell</title>
     <link rel="shortcut icon" type="image/png" href="https://kylekizirian.github.io/favicon.png">
     <link rel="shortcut icon" type="image/x-icon" href="https://kylekizirian.github.io/favicon.ico">
     <link href="https://kylekizirian.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Kizirian Full Atom Feed" />
@@ -14,7 +14,7 @@
     <meta name="description" content="" />
     <meta name="author" content="Kyle Kizirian" />
 
-    <meta name="keywords" content="python,math" />
+    <meta name="keywords" content="git,bash" />
 </head>
 <body>
     <header>
@@ -29,11 +29,11 @@
         </div>
     </header>
     <div id="wrapper">
-        <div id="content">            <h4 class="date">Feb 08, 2020</h4>
+        <div id="content">            <h4 class="date">Apr 05, 2020</h4>
 
             <article class="post">
                 <h2 class="title">
-                    <a href="https://kylekizirian.github.io/euclids-algorithm.html" rel="bookmark" title="Permanent Link to &quot;Finding the greatest common divisor in two lines&quot;">Finding the greatest common divisor in two lines</a>
+                    <a href="https://kylekizirian.github.io/git-history-in-the-shell.html" rel="bookmark" title="Permanent Link to &quot;Investigating Python's history from the shell&quot;">Investigating Python's history from the shell</a>
                 </h2>
 
                 
@@ -1153,9 +1153,24 @@ h6:hover .anchor-link {
 .highlight .il { color: #666666 } /* Literal.Number.Integer.Long */</style><div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Euclid's <em>Elements</em> gives a wonderfully simple algorithm for finding
-the greatest common divisor of two numbers. The algorithm can
-be expressed in just two lines<sup>1</sup>.</p>
+<p>Who are the top 10 commit authors in CPython's history?
+What percent of all of CPython's commits were made by the top 10
+commit authors? And can I figure this out in a single bash line?</p>
+<p>The answer to the third question is yes (it's a very long line).
+Let's look at how we'd build that line to get the answers to (1) and
+(2). I'll actually cheat here and use multiple lines for readability,
+but at the very end I'll show how it can be done in a single line.</p>
+<p>Parsing through a git repo's history is an excellent way to learn both
+git and bash. Git's interface is designed to be shell friendly
+so the same tricks involved in parsing git's output apply to parsing
+files and any kind of program output.</p>
+<p>Let's look at pulling a few interesting stats out of CPython's history</p>
+<ol>
+<li>How many commits are in CPython's history?</li>
+<li>How many different people have committed to CPython?</li>
+<li>Who are the top 10 committers?</li>
+<li>What % of all commits were made by the top 10 committers?</li>
+</ol>
 
 </div>
 </div>
@@ -1165,11 +1180,28 @@ be expressed in just two lines<sup>1</sup>.</p>
 <div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">euclid_gcd</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">a</span> <span class="k">if</span> <span class="n">b</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">euclid_gcd</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">%</span> <span class="n">b</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">cd</span> ~/code/cpython
 </pre></div>
 
     </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>/Users/Kyle/code/cpython
+</pre>
+</div>
+</div>
+
 </div>
 </div>
 
@@ -1177,7 +1209,9 @@ be expressed in just two lines<sup>1</sup>.</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>A few tests to show that this implementation is correct</p>
+<h2 id="How-many-commits-are-in-CPython's-history?">How many commits are in CPython's history?<a class="anchor-link" href="#How-many-commits-are-in-CPython's-history?">&#182;</a></h2><p>The all-important <code>git rev-list</code> prints all commit hashes reachable from
+a given commit. <code>wc -l</code> counts the number of lines
+in stdin so combining the two prints the total number of commits.</p>
 
 </div>
 </div>
@@ -1187,13 +1221,29 @@ be expressed in just two lines<sup>1</sup>.</p>
 <div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">assert</span> <span class="n">euclid_gcd</span><span class="p">(</span><span class="mi">45</span><span class="p">,</span> <span class="mi">75</span><span class="p">)</span> <span class="o">==</span> <span class="mi">15</span>
-<span class="k">assert</span> <span class="n">euclid_gcd</span><span class="p">(</span><span class="mi">75</span><span class="p">,</span> <span class="mi">45</span><span class="p">)</span> <span class="o">==</span> <span class="mi">15</span>
-<span class="k">assert</span> <span class="n">euclid_gcd</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">18</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span>
-<span class="k">assert</span> <span class="n">euclid_gcd</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+<div class=" highlight hl-ipython3"><pre><span></span>%%bash
+git rev-list HEAD <span class="p">|</span> wc -l
 </pre></div>
 
     </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>  106683
+</pre>
+</div>
+</div>
+
 </div>
 </div>
 
@@ -1201,10 +1251,11 @@ be expressed in just two lines<sup>1</sup>.</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>An even more powerful test is to use
-<a href="https://hypothesis.readthedocs.io/en/latest/">Hypothesis</a> to generate
-inputs and compare them to Python's built-in
-<a href="https://docs.python.org/3/library/math.html#math.gcd">math.gcd</a></p>
+<h2 id="How-many-different-people-have-committed-to-CPython?">How many different people have committed to CPython?<a class="anchor-link" href="#How-many-different-people-have-committed-to-CPython?">&#182;</a></h2><p>We can use <code>git show</code> to extract information about a particular commit.
+The output of <code>git show</code> opens in a paged view akin to <code>less</code>, but the
+<code>--no-pager</code> flag instructs git to just send its output to stdout.
+The <code>--no-patch</code> flag omits the commit's diff and displays just the
+commit information.</p>
 
 </div>
 </div>
@@ -1214,15 +1265,33 @@ inputs and compare them to Python's built-in
 <div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">from</span> <span class="nn">hypothesis</span> <span class="k">import</span> <span class="n">given</span><span class="p">,</span> <span class="n">strategies</span> <span class="k">as</span> <span class="n">st</span>
-
-<span class="nd">@given</span><span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="n">min_value</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">st</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="n">min_value</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
-<span class="k">def</span> <span class="nf">test_euclid_gcd</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
-    <span class="k">assert</span> <span class="n">euclid_gcd</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">==</span> <span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span>%%bash
+git show HEAD -n <span class="m">1</span> <span class="p">|</span> git --no-pager show --no-patch
 </pre></div>
 
     </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>commit b146568dfcbcd7409c724f8917e4f77433dd56e4
+Author: Serhiy Storchaka &lt;storchaka@gmail.com&gt;
+Date:   Sat Mar 21 15:53:28 2020 +0200
+
+    bpo-39652: Truncate the column name after &#39;[&#39; only if PARSE_COLNAMES is set. (GH-18942)
+</pre>
+</div>
+</div>
+
 </div>
 </div>
 
@@ -1230,10 +1299,9 @@ inputs and compare them to Python's built-in
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Performance-Metrics">Performance Metrics<a class="anchor-link" href="#Performance-Metrics">&#182;</a></h2><p>The performance of this simple implementation can be compared to <code>math.gcd</code>
-by generating a large list of random integer tuples, choosing a tuple
-at random, and measuring the average execution time to find their
-greatest common divisor.</p>
+<p><code>git show</code> also provies a <code>--format</code> option for specific
+information about a commit. The <code>%an</code> specifier prints
+the author's name.</p>
 
 </div>
 </div>
@@ -1243,22 +1311,53 @@ greatest common divisor.</p>
 <div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">random</span> <span class="k">import</span> <span class="n">choice</span><span class="p">,</span> <span class="n">randint</span>
-<span class="n">rand_tuples</span> <span class="o">=</span> <span class="p">[(</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="o">**</span><span class="mi">6</span><span class="p">),</span> <span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="o">**</span><span class="mi">6</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="o">**</span><span class="mi">4</span><span class="p">)]</span>
+<div class=" highlight hl-ipython3"><pre><span></span>%%bash
+git show HEAD -n <span class="m">1</span> <span class="p">|</span> git --no-pager show --no-patch --format<span class="o">=</span>%an
 </pre></div>
 
     </div>
 </div>
 </div>
 
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Serhiy Storchaka
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><code>git rev-list</code> can be piped into a loop to <code>git show</code> commit
+information one-by-one.</p>
+
+</div>
+</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>it
-<span class="n">euclid_gcd</span><span class="p">(</span><span class="o">*</span><span class="n">choice</span><span class="p">(</span><span class="n">rand_tuples</span><span class="p">))</span>
+<div class=" highlight hl-ipython3"><pre><span></span>%%bash
+git rev-list HEAD -n <span class="m">10</span> <span class="p">|</span>
+<span class="k">while</span> <span class="nb">read</span> commit
+<span class="k">do</span>
+    git --no-pager show --no-patch --format<span class="o">=</span><span class="s1">&#39;%an&#39;</span> <span class="nv">$commit</span>
+<span class="k">done</span>
 </pre></div>
 
     </div>
@@ -1275,7 +1374,16 @@ greatest common divisor.</p>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>3.7 µs ± 305 ns per loop (mean ± std. dev. of 7 runs, 100000 loops each)
+<pre>Serhiy Storchaka
+Serhiy Storchaka
+Victor Stinner
+Victor Stinner
+Victor Stinner
+Victor Stinner
+Victor Stinner
+Hai Shi
+amaajemyfren
+Victor Stinner
 </pre>
 </div>
 </div>
@@ -1283,14 +1391,31 @@ greatest common divisor.</p>
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now, we have the last 10 commit authors, but we want the number of
+unique commit authors. The <code>uniq</code> command sounds promising but it only
+removes duplicates on adjacent lines, so we first need to <code>sort</code> stdin
+and then pipe the output of that into <code>uniq</code> to get unique authors.</p>
+
+</div>
+</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>it
-<span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="o">*</span><span class="n">choice</span><span class="p">(</span><span class="n">rand_tuples</span><span class="p">))</span>
+<div class=" highlight hl-ipython3"><pre><span></span>%%bash
+git rev-list HEAD -n <span class="m">10</span> <span class="p">|</span>
+<span class="k">while</span> <span class="nb">read</span> commit
+<span class="k">do</span>
+    git --no-pager show --no-patch --format<span class="o">=</span><span class="s1">&#39;%an&#39;</span> <span class="nv">$commit</span>
+<span class="k">done</span> <span class="p">|</span>
+sort <span class="p">|</span>
+uniq
 </pre></div>
 
     </div>
@@ -1307,7 +1432,10 @@ greatest common divisor.</p>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>1.41 µs ± 101 ns per loop (mean ± std. dev. of 7 runs, 1000000 loops each)
+<pre>Hai Shi
+Serhiy Storchaka
+Victor Stinner
+amaajemyfren
 </pre>
 </div>
 </div>
@@ -1319,37 +1447,656 @@ greatest common divisor.</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Unsurprisingly, the standard library's implementation is over 2x faster.
-I haven't dug in to see where it's optimizing, but surely it's at least
-partly due to being
-<a href="https://github.com/python/cpython/blob/master/Modules/mathmodule.c">implemented in C</a>.</p>
+<p>Again, we can pipe the output of this to <code>wc -l</code> to count the
+number of lines in stdin, giving us the number of unique commit
+authors.</p>
 
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Other-Readings">Other Readings<a class="anchor-link" href="#Other-Readings">&#182;</a></h2><p>Excellent intuition and a proof is provided in
-<a href="https://www.amazon.com/Algorithms-Sanjoy-Dasgupta/dp/0073523402">Algorithms</a>
-by Dasgupta, Papadimitriou, and Vazirani in Section 1.2.3 <em>Euclid's
-algorithm for greatest common divisor</em>.</p>
-<p>The
-<a href="https://en.wikipedia.org/wiki/Euclidean_algorithm">Wikipedia page on Euclid's algorithm</a>
-goes into even greater depth and provides interesting history.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Footnotes">Footnotes<a class="anchor-link" href="#Footnotes">&#182;</a></h2><ol>
-<li>This can technically be expressed in one line with</li>
-</ol>
-<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">euclid_gcd</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span> <span class="k">return</span> <span class="n">a</span> <span class="k">if</span> <span class="n">b</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">euclid_gcd</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="o">%</span><span class="n">b</span><span class="p">)</span>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span>%%bash
+git rev-list HEAD -n <span class="m">10</span> <span class="p">|</span>
+<span class="k">while</span> <span class="nb">read</span> commit
+<span class="k">do</span>
+    git --no-pager show --no-patch --format<span class="o">=</span><span class="s1">&#39;%an&#39;</span> <span class="nv">$commit</span>
+<span class="k">done</span> <span class="p">|</span>
+sort <span class="p">|</span> uniq <span class="p">|</span> wc -l
 </pre></div>
-<p>But this is almost offensively concise.</p>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>       4
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Removing the <code>-n 10</code> from <code>git rev-list</code> runs over the entire
+history.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span>%%bash
+git rev-list HEAD <span class="p">|</span>
+<span class="k">while</span> <span class="nb">read</span> commit
+<span class="k">do</span>
+    git --no-pager show --no-patch --format<span class="o">=</span><span class="s1">&#39;%an&#39;</span> <span class="nv">$commit</span>
+<span class="k">done</span> <span class="p">|</span>
+sort <span class="p">|</span>
+uniq <span class="p">|</span>
+wc -l
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>    1292
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Who-are-the-top-10-committers?">Who are the top 10 committers?<a class="anchor-link" href="#Who-are-the-top-10-committers?">&#182;</a></h1><p>With only a slight modification to the above, adding a <code>-c</code> flag
+to <code>uniq</code> prints the number of occurrences of a line.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span>%%bash
+git rev-list HEAD -n <span class="m">10</span> <span class="p">|</span>
+<span class="k">while</span> <span class="nb">read</span> commit
+<span class="k">do</span>
+    git --no-pager show --no-patch --format<span class="o">=</span><span class="s1">&#39;%an&#39;</span> <span class="nv">$commit</span>
+<span class="k">done</span> <span class="p">|</span>
+sort <span class="p">|</span>
+uniq -c
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>   1 Hai Shi
+   2 Serhiy Storchaka
+   6 Victor Stinner
+   1 amaajemyfren
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To get the top 10 authors in order, we can re-sort the output by
+piping the output of <code>uniq -c</code> back into <code>sort</code>. For this sort,
+we'll need to pass a <code>-r</code> flag to sort in reverse order (printing
+the largest numbers first) and a <code>-n</code> flag to do a numeric sort.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span>%%bash
+git rev-list HEAD -n <span class="m">10</span> <span class="p">|</span>
+<span class="k">while</span> <span class="nb">read</span> commit
+<span class="k">do</span> git --no-pager show --no-patch --format<span class="o">=</span><span class="s1">&#39;%an&#39;</span> <span class="nv">$commit</span>
+<span class="k">done</span> <span class="p">|</span>
+sort <span class="p">|</span>
+uniq -c <span class="p">|</span>
+sort -rn
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>   6 Victor Stinner
+   2 Serhiy Storchaka
+   1 amaajemyfren
+   1 Hai Shi
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Finally we can run this over the entire history and pipe the output
+to <code>head</code> to grab just the first 10 lines.</p>
+<p>Note: this operation takes a <em>long</em> time due to the two massive sorts,
+I recommend redirecting the output to a file and running this in the
+background by appending <code>&gt;&gt; top_authors.txt &amp;</code>. I've done this
+separately and will use the top_authors.txt file from here on out.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span>%%bash
+git rev-list HEAD <span class="p">|</span>
+<span class="k">while</span> <span class="nb">read</span> commit
+<span class="k">do</span>
+    git --no-pager show --no-patch --format<span class="o">=</span><span class="s1">&#39;%an&#39;</span> <span class="nv">$commit</span>
+<span class="k">done</span> <span class="p">|</span>
+sort <span class="p">|</span>
+uniq -c <span class="p">|</span>
+sort -rn <span class="p">|</span>
+head
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>11194 Guido van Rossum
+6110 Victor Stinner
+5837 Benjamin Peterson
+5677 Georg Brandl
+5465 Fred Drake
+4159 Raymond Hettinger
+4006 Serhiy Storchaka
+3766 Antoine Pitrou
+2978 Jack Jansen
+2765 Martin v. Löwis
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="What-%-of-all-commits-come-from-the-top-10-commit-authors?">What % of all commits come from the top 10 commit authors?<a class="anchor-link" href="#What-%-of-all-commits-come-from-the-top-10-commit-authors?">&#182;</a></h2><p>So far we've used only a few commands combined with the power of
+piping and looping. We're about to look at a lot more commands that
+do very specific things. We'll build up slowly and look at the output
+of each intermediate step, but it's not very important what any
+individual command accomplishes. More important is understanding how
+data flows through pipes and that commnands exist for doing any
+kind of data manipulation. Like any programming language, learning the
+specific pieces comes with repeated practice.</p>
+<p>To get the percentage of commits from the top authors, we need to
+combine all of their commit counts and divide by the total number
+of commits. To get an individual author's commit count, we can
+use <code>cut</code> to extract the commit count from the author line, the <code>-d ' '</code>
+specifies that the line is delimited by spaces and <code>-f 1</code> specifies
+that we want the first column (that is, everything before the first space).</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span>%%bash
+cat top_authors.txt <span class="p">|</span>
+<span class="k">while</span> <span class="nb">read</span> author
+<span class="k">do</span>
+    <span class="nb">echo</span> <span class="nv">$author</span> <span class="p">|</span>
+    cut -d <span class="s1">&#39; &#39;</span> -f <span class="m">1</span>
+<span class="k">done</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>11194
+6110
+5837
+5677
+5465
+4159
+4006
+3766
+2978
+2765
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now, to get each author's contribution as a percentage, we can run
+<code>git rev-list HEAD | wc -l</code> and assign its output to a variable.
+Then, we can use <code>awk</code> to take each author's commit count and append
+<code>*100 / $num_commits</code> to generate an expression for each author's
+commit percentage.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span>%%bash
+<span class="nv">num_commits</span><span class="o">=</span><span class="sb">`</span>git rev-list HEAD <span class="p">|</span> wc -l<span class="sb">`</span>
+
+cat top_authors.txt <span class="p">|</span>
+<span class="k">while</span> <span class="nb">read</span> author
+<span class="k">do</span>
+    <span class="nb">echo</span> <span class="nv">$author</span> <span class="p">|</span>
+    cut -d <span class="s1">&#39; &#39;</span> -f <span class="m">1</span> <span class="p">|</span>
+    awk -v <span class="nv">num_commits</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$num_commits</span><span class="s2">&quot;</span> <span class="s1">&#39;{print $0 &quot;*100 /&quot; num_commits}&#39;</span>
+<span class="k">done</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>11194*100 /  106683
+6110*100 /  106683
+5837*100 /  106683
+5677*100 /  106683
+5465*100 /  106683
+4159*100 /  106683
+4006*100 /  106683
+3766*100 /  106683
+2978*100 /  106683
+2765*100 /  106683
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To evaluate this expression, we can pipe it into <code>bc</code> (I think that this stands for
+Berkeley calculator but I couldn't find definitive evidence).</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span>%%bash
+<span class="nv">num_commits</span><span class="o">=</span><span class="sb">`</span>git rev-list HEAD <span class="p">|</span> wc -l<span class="sb">`</span>
+
+cat top_authors.txt <span class="p">|</span>
+<span class="k">while</span> <span class="nb">read</span> author
+<span class="k">do</span>
+    <span class="nb">echo</span> <span class="nv">$author</span> <span class="p">|</span>
+    cut -d <span class="s1">&#39; &#39;</span> -f <span class="m">1</span> <span class="p">|</span>
+    awk -v <span class="nv">num_commits</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$num_commits</span><span class="s2">&quot;</span> <span class="s1">&#39;{print $0 &quot;*100/&quot; num_commits}&#39;</span> <span class="p">|</span>
+    bc -l
+<span class="k">done</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>10.49276829485485035103
+5.72724801514768051142
+5.47134969957725223325
+5.32137266481070086143
+5.12265309374502029376
+3.89846554746304472127
+3.75505000796752997197
+3.53008445581770291424
+2.79144755959243740802
+2.59179063205946589428
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We're almost there, the last step is to sum all of these lines to get
+the total commit percentage. We can use <code>paste</code> to smash together all
+of the lines in stdin. The <code>-s</code> flag indicates that we'll be reading in just
+one stream of text (as opposed to pasting two together), the <code>-d+</code>
+option pastes each line together with a <code>+</code> and <code>-</code>
+directs <code>paste</code> to read from stdin as opposed to a file.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span>%%bash
+<span class="nv">num_commits</span><span class="o">=</span><span class="sb">`</span>git rev-list HEAD <span class="p">|</span> wc -l<span class="sb">`</span>
+
+cat top_authors.txt <span class="p">|</span>
+<span class="k">while</span> <span class="nb">read</span> author
+<span class="k">do</span>
+    <span class="nb">echo</span> <span class="nv">$author</span> <span class="p">|</span>
+    cut -d <span class="s1">&#39; &#39;</span> -f <span class="m">1</span> <span class="p">|</span>
+    awk -v <span class="nv">num_commits</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$num_commits</span><span class="s2">&quot;</span> <span class="s1">&#39;{print $0 &quot;*100/&quot; num_commits}&#39;</span> <span class="p">|</span>
+    bc -l
+<span class="k">done</span> <span class="p">|</span>
+paste -s -d+ -
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>10.49276829485485035103+5.72724801514768051142+5.47134969957725223325+5.32137266481070086143+5.12265309374502029376+3.89846554746304472127+3.75505000796752997197+3.53008445581770291424+2.79144755959243740802+2.59179063205946589428
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The last step is simply to pipe this back into <code>bc</code> to evaluate
+the expression.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[16]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span>%%bash
+<span class="nv">num_commits</span><span class="o">=</span><span class="sb">`</span>git rev-list HEAD <span class="p">|</span> wc -l<span class="sb">`</span>
+
+cat top_authors.txt <span class="p">|</span>
+<span class="k">while</span> <span class="nb">read</span> author
+<span class="k">do</span>
+    <span class="nb">echo</span> <span class="nv">$author</span> <span class="p">|</span>
+    cut -d <span class="s1">&#39; &#39;</span> -f <span class="m">1</span> <span class="p">|</span>
+    awk -v <span class="nv">num_commits</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$num_commits</span><span class="s2">&quot;</span> <span class="s1">&#39;{print $0 &quot;*100/&quot; num_commits}&#39;</span> <span class="p">|</span>
+    bc -l
+<span class="k">done</span> <span class="p">|</span>
+paste -s -d+ - <span class="p">|</span>
+bc -l
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>48.70222997103568516067
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>And we're done!</p>
+<h2 id="The-Python-way">The Python way<a class="anchor-link" href="#The-Python-way">&#182;</a></h2><p>Python's subprocess module makes it easy to execute arbitrary commands
+and read from stdout. This can be useful for writing cross-platform
+scripts but it also allows you to use higher-level data structures like
+<code>collections.Counter</code> for ease and readability. Take the following
+equivalent script to find the top 10 commit authors.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[17]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">Counter</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+
+<span class="n">cpython_repo</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;code&quot;</span> <span class="o">/</span> <span class="s2">&quot;cpython&quot;</span>
+<span class="n">rev_list</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+    <span class="p">[</span><span class="s2">&quot;git&quot;</span><span class="p">,</span> <span class="s2">&quot;rev-list&quot;</span><span class="p">,</span> <span class="s2">&quot;HEAD&quot;</span><span class="p">],</span>
+    <span class="n">cwd</span><span class="o">=</span><span class="n">cpython_repo</span><span class="p">,</span>
+    <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+    <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">commit_hashes</span> <span class="o">=</span> <span class="n">rev_list</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">commit_authors</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">commit_hash</span> <span class="ow">in</span> <span class="n">commit_hashes</span><span class="p">:</span>
+    <span class="n">commit_author</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="s2">&quot;git&quot;</span><span class="p">,</span> <span class="s2">&quot;--no-pager&quot;</span><span class="p">,</span> <span class="s2">&quot;show&quot;</span><span class="p">,</span> <span class="n">commit_hash</span><span class="p">,</span>
+            <span class="s2">&quot;--oneline&quot;</span><span class="p">,</span> <span class="s2">&quot;--no-patch&quot;</span><span class="p">,</span> <span class="s2">&quot;--format=</span><span class="si">%a</span><span class="s2">n&quot;</span>
+        <span class="p">],</span>
+        <span class="n">cwd</span><span class="o">=</span><span class="n">cpython_repo</span><span class="p">,</span>
+        <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+        <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">commit_authors</span><span class="o">.</span><span class="n">update</span><span class="p">([</span><span class="n">commit_author</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">strip</span><span class="p">()])</span>
+
+<span class="k">for</span> <span class="n">commit_author</span> <span class="ow">in</span> <span class="n">commit_authors</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">commit_author</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>(&#39;Guido van Rossum&#39;, 11194)
+(&#39;Victor Stinner&#39;, 6110)
+(&#39;Benjamin Peterson&#39;, 5837)
+(&#39;Georg Brandl&#39;, 5677)
+(&#39;Fred Drake&#39;, 5465)
+(&#39;Raymond Hettinger&#39;, 4159)
+(&#39;Serhiy Storchaka&#39;, 4006)
+(&#39;Antoine Pitrou&#39;, 3766)
+(&#39;Jack Jansen&#39;, 2978)
+(&#39;Martin v. Löwis&#39;, 2765)
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Parting-thoughts">Parting thoughts<a class="anchor-link" href="#Parting-thoughts">&#182;</a></h2><p>I've been heavily influenced by Gary Bernhardt's content and this
+post in particular is inspired by his talk on
+<a href="https://www.youtube.com/watch?v=sCZJblyT_XM">The Unix Chainsaw</a>. Gary's
+website, <a href="https://www.destroyallsoftware.com/screencasts">Destroy All Software</a>,
+contains a ton of great screencasts on a wide range of topics and watching
+him work is a mesmerizing demonstration vim and unix mastery.</p>
+<p>I've also found this post on
+<a href="https://blog.balthazar-rouberol.com/text-processing-in-the-shell">Text Processing in the Unix Shell</a>
+to be a great introduction and resource. For git wisdom, I always recommend
+<a href="https://missing.csail.mit.edu/2020/version-control/">Missing Semester of Your CS Education lecture on git</a>
+which gives an fantastic overview of git's internals.</p>
+<p>Finally, as promised, is the script above smashed into a single
+bash line.</p>
+
+<pre><code>git rev-list head | wc -l | read -d '' num_commits ; cat top_authors.txt | while read author; do echo $author | cut -d ' ' -f 1 | awk -v num_commits=$num_commits '{print $0 "*100 /" num_commits}' | bc -l | paste -s -d+ - | bc -l; done</code></pre>
 
 </div>
 </div>
@@ -1389,11 +2136,11 @@ goes into even greater depth and provides interesting history.</p>
                 <div class="clear"></div>
 
                 <div class="info">
-                    <a href="https://kylekizirian.github.io/euclids-algorithm.html">posted at 12:00</a>
-                    &nbsp;&middot;&nbsp;<a href="https://kylekizirian.github.io/category/python.html" rel="tag">python</a>
+                    <a href="https://kylekizirian.github.io/git-history-in-the-shell.html">posted at 12:00</a>
+                    &nbsp;&middot;&nbsp;<a href="https://kylekizirian.github.io/category/git.html" rel="tag">git</a>
                     &nbsp;&middot;
-                    &nbsp;<a href="https://kylekizirian.github.io/tag/python.html" class="tags">python</a>
-                    &nbsp;<a href="https://kylekizirian.github.io/tag/math.html" class="tags">math</a>
+                    &nbsp;<a href="https://kylekizirian.github.io/tag/git.html" class="tags">git</a>
+                    &nbsp;<a href="https://kylekizirian.github.io/tag/bash.html" class="tags">bash</a>
                 </div>
             </article>
             <div class="clear"></div>
