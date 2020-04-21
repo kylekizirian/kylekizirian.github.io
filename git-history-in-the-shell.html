@@ -2092,11 +2092,11 @@ him work is a mesmerizing demonstration of vim and unix mastery.</p>
 <a href="https://blog.balthazar-rouberol.com/text-processing-in-the-shell">Text Processing in the Unix Shell</a>
 to be a great introduction and resource. For git wisdom, I always recommend
 <a href="https://missing.csail.mit.edu/2020/version-control/">Missing Semester of Your CS Education lecture on git</a>
-which gives an fantastic overview of git's internals.</p>
+which gives a fantastic overview of git's internals.</p>
 <p>Finally, as promised, is the script above smashed into a single
 bash line.</p>
 
-<pre><code>git rev-list head | wc -l | read -d '' num_commits ; cat top_authors.txt | while read author; do echo $author | cut -d ' ' -f 1 | awk -v num_commits=$num_commits '{print $0 "*100 /" num_commits}' | bc -l | paste -s -d+ - | bc -l; done</code></pre>
+<pre><code>git rev-list head | wc -l | read -d '' num_commits ; cat top_authors.txt | while read author; do echo $author | cut -d ' ' -f 1 | awk -v num_commits=$num_commits '{print $0 "*100 /" num_commits}' | bc -l; done | paste -s -d+ - | bc -l</code></pre>
 
 </div>
 </div>

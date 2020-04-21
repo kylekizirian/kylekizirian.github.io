@@ -2052,11 +2052,11 @@ him work is a mesmerizing demonstration of vim and unix mastery.&lt;/p&gt;
 &lt;a href="https://blog.balthazar-rouberol.com/text-processing-in-the-shell"&gt;Text Processing in the Unix Shell&lt;/a&gt;
 to be a great introduction and resource. For git wisdom, I always recommend
 &lt;a href="https://missing.csail.mit.edu/2020/version-control/"&gt;Missing Semester of Your CS Education lecture on git&lt;/a&gt;
-which gives an fantastic overview of git's internals.&lt;/p&gt;
+which gives a fantastic overview of git's internals.&lt;/p&gt;
 &lt;p&gt;Finally, as promised, is the script above smashed into a single
 bash line.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;git rev-list head | wc -l | read -d '' num_commits ; cat top_authors.txt | while read author; do echo $author | cut -d ' ' -f 1 | awk -v num_commits=$num_commits '{print $0 "*100 /" num_commits}' | bc -l | paste -s -d+ - | bc -l; done&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;git rev-list head | wc -l | read -d '' num_commits ; cat top_authors.txt | while read author; do echo $author | cut -d ' ' -f 1 | awk -v num_commits=$num_commits '{print $0 "*100 /" num_commits}' | bc -l; done | paste -s -d+ - | bc -l&lt;/code&gt;&lt;/pre&gt;
 
 &lt;/div&gt;
 &lt;/div&gt;
