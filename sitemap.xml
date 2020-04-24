@@ -4,175 +4,175 @@ xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitem
 xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
-<loc>https://kylekizirian.github.io/</loc>
-<lastmod>2020-04-21T21:01:38-00:00</lastmod>
+<loc>/</loc>
+<lastmod>2020-04-23T23:59:15-00:00</lastmod>
 <changefreq>hourly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>https://kylekizirian.github.io/archives.html</loc>
-<lastmod>2020-04-21T21:01:38-00:00</lastmod>
+<loc>/archives.html</loc>
+<lastmod>2020-04-23T23:59:15-00:00</lastmod>
 <changefreq>hourly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>https://kylekizirian.github.io/tags.html</loc>
-<lastmod>2020-04-21T21:01:38-00:00</lastmod>
+<loc>/tags.html</loc>
+<lastmod>2020-04-23T23:59:15-00:00</lastmod>
 <changefreq>hourly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>https://kylekizirian.github.io/categories.html</loc>
-<lastmod>2020-04-21T21:01:38-00:00</lastmod>
+<loc>/categories.html</loc>
+<lastmod>2020-04-23T23:59:15-00:00</lastmod>
 <changefreq>hourly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>https://kylekizirian.github.io/git-history-in-the-shell.html</loc>
+<loc>/git-history-in-the-shell.html</loc>
 <lastmod>2020-04-05T12:00:00-04:00</lastmod>
 <changefreq>always</changefreq>
 <priority>1</priority>
 </url>
 
 <url>
-<loc>https://kylekizirian.github.io/sigcont-and-sigstop.html</loc>
+<loc>/sigcont-and-sigstop.html</loc>
 <lastmod>2020-03-15T12:00:00-04:00</lastmod>
 <changefreq>always</changefreq>
 <priority>1</priority>
 </url>
 
 <url>
-<loc>https://kylekizirian.github.io/ned-batchelders-updated-pdbrc.html</loc>
+<loc>/ned-batchelders-updated-pdbrc.html</loc>
 <lastmod>2020-03-10T12:00:00-04:00</lastmod>
 <changefreq>always</changefreq>
 <priority>1</priority>
 </url>
 
 <url>
-<loc>https://kylekizirian.github.io/pythons-is-equals.html</loc>
+<loc>/pythons-is-equals.html</loc>
 <lastmod>2020-03-01T12:00:00-05:00</lastmod>
 <changefreq>always</changefreq>
 <priority>1</priority>
 </url>
 
 <url>
-<loc>https://kylekizirian.github.io/zeckendorf-and-hypothesis.html</loc>
+<loc>/zeckendorf-and-hypothesis.html</loc>
 <lastmod>2020-02-22T12:00:00-05:00</lastmod>
 <changefreq>always</changefreq>
 <priority>1</priority>
 </url>
 
 <url>
-<loc>https://kylekizirian.github.io/euclids-algorithm.html</loc>
+<loc>/euclids-algorithm.html</loc>
 <lastmod>2020-02-08T12:00:00-05:00</lastmod>
 <changefreq>always</changefreq>
 <priority>1</priority>
 </url>
 
 <url>
-<loc>https://kylekizirian.github.io/debugging-robot-framework-libraries.html</loc>
+<loc>/debugging-robot-framework-libraries.html</loc>
 <lastmod>2020-01-08T12:00:00-05:00</lastmod>
 <changefreq>always</changefreq>
 <priority>1</priority>
 </url>
 
 <url>
-<loc>https://kylekizirian.github.io/problem6.html</loc>
+<loc>/problem6.html</loc>
 <lastmod>2019-12-24T12:00:00-05:00</lastmod>
 <changefreq>always</changefreq>
 <priority>1</priority>
 </url>
 
 <url>
-<loc>https://kylekizirian.github.io/euler-partition-function.html</loc>
+<loc>/euler-partition-function.html</loc>
 <lastmod>2019-11-26T12:00:00-05:00</lastmod>
 <changefreq>always</changefreq>
 <priority>1</priority>
 </url>
 
 <url>
-<loc>https://kylekizirian.github.io/category/git.html</loc>
+<loc>/category/git.html</loc>
 <lastmod>2020-04-05T12:00:00-04:56</lastmod>
 <changefreq>hourly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>https://kylekizirian.github.io/category/python.html</loc>
+<loc>/category/python.html</loc>
 <lastmod>2020-03-15T12:00:00-04:56</lastmod>
 <changefreq>hourly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>https://kylekizirian.github.io/tag/git.html</loc>
+<loc>/tag/git.html</loc>
 <lastmod>2020-04-05T12:00:00-04:56</lastmod>
 <changefreq>hourly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>https://kylekizirian.github.io/tag/bash.html</loc>
+<loc>/tag/bash.html</loc>
 <lastmod>2020-04-05T12:00:00-04:56</lastmod>
 <changefreq>hourly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>https://kylekizirian.github.io/tag/python.html</loc>
+<loc>/tag/python.html</loc>
 <lastmod>2020-03-15T12:00:00-04:56</lastmod>
 <changefreq>hourly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>https://kylekizirian.github.io/tag/debugging.html</loc>
+<loc>/tag/debugging.html</loc>
 <lastmod>2020-03-10T12:00:00-04:56</lastmod>
 <changefreq>hourly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>https://kylekizirian.github.io/tag/testing.html</loc>
+<loc>/tag/testing.html</loc>
 <lastmod>2020-02-22T12:00:00-04:56</lastmod>
 <changefreq>hourly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>https://kylekizirian.github.io/tag/math.html</loc>
+<loc>/tag/math.html</loc>
 <lastmod>2020-02-08T12:00:00-04:56</lastmod>
 <changefreq>hourly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>https://kylekizirian.github.io/tag/robot-framework.html</loc>
+<loc>/tag/robot-framework.html</loc>
 <lastmod>2020-01-08T12:00:00-04:56</lastmod>
 <changefreq>hourly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>https://kylekizirian.github.io/tag/jupyter.html</loc>
+<loc>/tag/jupyter.html</loc>
 <lastmod>2019-12-24T12:00:00-04:56</lastmod>
 <changefreq>hourly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>https://kylekizirian.github.io/tag/euler.html</loc>
+<loc>/tag/euler.html</loc>
 <lastmod>2019-11-26T12:00:00-04:56</lastmod>
 <changefreq>hourly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>https://kylekizirian.github.io/author/kyle-kizirian.html</loc>
+<loc>/author/kyle-kizirian.html</loc>
 <lastmod>2020-04-05T12:00:00-04:56</lastmod>
 <changefreq>hourly</changefreq>
 <priority>0.5</priority>
