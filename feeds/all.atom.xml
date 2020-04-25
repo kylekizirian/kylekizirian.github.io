@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Kizirian</title><link href="https://kylekizirian.github.io/" rel="alternate"></link><link href="https://kylekizirian.github.io/feeds/all.atom.xml" rel="self"></link><id>https://kylekizirian.github.io/</id><updated>2020-04-23T12:00:00-04:00</updated><entry><title>How Robot Framework evaluates keywords with embedded arguments</title><link href="https://kylekizirian.github.io/robot-frameworks-keywords.html" rel="alternate"></link><published>2020-04-23T12:00:00-04:00</published><updated>2020-04-23T12:00:00-04:00</updated><author><name>Kyle Kizirian</name></author><id>tag:kylekizirian.github.io,2020-04-23:/robot-frameworks-keywords.html</id><summary type="html">&lt;p&gt;How Robot Framework evaluates keywords with embedded arguments&lt;/p&gt;</summary><content type="html">&lt;style type="text/css"&gt;/*!
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Kizirian</title><link href="https://kylekizirian.github.io/" rel="alternate"></link><link href="https://kylekizirian.github.io/feeds/all.atom.xml" rel="self"></link><id>https://kylekizirian.github.io/</id><updated>2020-04-24T12:00:00-04:00</updated><entry><title>How Robot Framework evaluates keywords with embedded arguments</title><link href="https://kylekizirian.github.io/robot-framework-keywords.html" rel="alternate"></link><published>2020-04-24T12:00:00-04:00</published><updated>2020-04-24T12:00:00-04:00</updated><author><name>Kyle Kizirian</name></author><id>tag:kylekizirian.github.io,2020-04-24:/robot-framework-keywords.html</id><summary type="html">&lt;p&gt;How Robot Framework evaluates keywords with embedded arguments&lt;/p&gt;</summary><content type="html">&lt;style type="text/css"&gt;/*!
 *
 * IPython notebook
 *
@@ -1114,14 +1114,14 @@ h6:hover .anchor-link {
 &lt;/div&gt;&lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
 &lt;p&gt;Let's look at how Robot Framework takes a statement
-like this&lt;/p&gt;
+like this:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;Add 3 and 4&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;And turns it into a function call like this&lt;/p&gt;
+&lt;p&gt;And turns it into a function call like this:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;add&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;1&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;2&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;Take an &lt;code&gt;Arithmetic&lt;/code&gt; library that provides a few
-keywords with embedded arguments&lt;/p&gt;
+keywords with embedded arguments:&lt;/p&gt;
 
 &lt;/div&gt;
 &lt;/div&gt;
@@ -1157,7 +1157,7 @@ keywords with embedded arguments&lt;/p&gt;
 &lt;/div&gt;&lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
 &lt;p&gt;At the beginnning of a test case, Robot Framework
-creates an instance of this class.&lt;/p&gt;
+creates an instance of this class:&lt;/p&gt;
 
 &lt;/div&gt;
 &lt;/div&gt;
@@ -1179,7 +1179,7 @@ creates an instance of this class.&lt;/p&gt;
 &lt;/div&gt;&lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
 &lt;p&gt;Robot Framework adds a &lt;code&gt;robot_name&lt;/code&gt; attribute to
-keywords with embedded arguments.&lt;/p&gt;
+keywords with embedded arguments:&lt;/p&gt;
 
 &lt;/div&gt;
 &lt;/div&gt;
@@ -1287,15 +1287,17 @@ Method: subtract
 &lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;&lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;p&gt;Now, given a string like&lt;/p&gt;
+&lt;p&gt;Now, given a string like:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;Add 1 and 2&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;How do we match that to one of our keywords? We can
 substitute all instances of Robot Framework's variable
 syntax (that is, everything around a &lt;code&gt;${}&lt;/code&gt;) with a
-regular expression that matches any string. We also
-want to capture every match so that we can pass it
-as an argument to the associated method.&lt;/p&gt;
+&lt;code&gt;(.*)&lt;/code&gt; to create a regular expression that matches
+any uses of the keyword. The &lt;code&gt;.*&lt;/code&gt; matches any string
+in the variable's place and the &lt;code&gt;()&lt;/code&gt; creates a capturing
+group that we can use to retrieve the values being
+passed as arguments.&lt;/p&gt;
 
 &lt;/div&gt;
 &lt;/div&gt;
@@ -1346,11 +1348,10 @@ Subtract (.*) from (.*)
 &lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;&lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;p&gt;Given a string like&lt;/p&gt;
+&lt;p&gt;Given a string like:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;Add 1 and 2&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;We can check for a match for a match against each regular
-expression.&lt;/p&gt;
+&lt;p&gt;We can check for a match against each regular expression.&lt;/p&gt;
 
 &lt;/div&gt;
 &lt;/div&gt;
@@ -2776,7 +2777,7 @@ Date:   Sat Mar 21 15:53:28 2020 +0200
 &lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;&lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;p&gt;&lt;code&gt;git show&lt;/code&gt; also provies a &lt;code&gt;--format&lt;/code&gt; option for specific
+&lt;p&gt;&lt;code&gt;git show&lt;/code&gt; also provides a &lt;code&gt;--format&lt;/code&gt; option for specific
 information about a commit. The &lt;code&gt;%an&lt;/code&gt; specifier prints
 the author's name.&lt;/p&gt;
 
