@@ -3189,7 +3189,7 @@ piping and looping. We're about to look at a lot more commands that
 do very specific things. We'll build up slowly and look at the output
 of each intermediate step, but it's not very important what any
 individual command accomplishes. More important is understanding how
-data flows through pipes and that commnands exist for doing any
+data flows through pipes and that commands exist for doing any
 kind of data manipulation. Like any programming language, learning the
 specific pieces comes with repeated practice.&lt;/p&gt;
 &lt;p&gt;To get the percentage of commits from the top authors, we need to
