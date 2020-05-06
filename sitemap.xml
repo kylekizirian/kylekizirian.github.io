@@ -5,30 +5,37 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>https://kylekizirian.github.io/</loc>
-<lastmod>2020-05-02T10:49:04-00:00</lastmod>
+<lastmod>2020-05-05T22:00:39-00:00</lastmod>
 <changefreq>hourly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>https://kylekizirian.github.io/archives.html</loc>
-<lastmod>2020-05-02T10:49:04-00:00</lastmod>
+<lastmod>2020-05-05T22:00:39-00:00</lastmod>
 <changefreq>hourly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>https://kylekizirian.github.io/tags.html</loc>
-<lastmod>2020-05-02T10:49:04-00:00</lastmod>
+<lastmod>2020-05-05T22:00:39-00:00</lastmod>
 <changefreq>hourly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>https://kylekizirian.github.io/categories.html</loc>
-<lastmod>2020-05-02T10:49:04-00:00</lastmod>
+<lastmod>2020-05-05T22:00:39-00:00</lastmod>
 <changefreq>hourly</changefreq>
 <priority>0.5</priority>
+</url>
+
+<url>
+<loc>https://kylekizirian.github.io/random-walk-matplotlib.html</loc>
+<lastmod>2020-05-05T12:00:00-04:00</lastmod>
+<changefreq>always</changefreq>
+<priority>1</priority>
 </url>
 
 <url>
@@ -109,6 +116,13 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 </url>
 
 <url>
+<loc>https://kylekizirian.github.io/category/jupyter.html</loc>
+<lastmod>2020-05-05T12:00:00-04:56</lastmod>
+<changefreq>hourly</changefreq>
+<priority>0.5</priority>
+</url>
+
+<url>
 <loc>https://kylekizirian.github.io/category/python.html</loc>
 <lastmod>2020-03-15T12:00:00-04:56</lastmod>
 <changefreq>hourly</changefreq>
@@ -124,7 +138,21 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>https://kylekizirian.github.io/tag/python.html</loc>
-<lastmod>2020-04-24T12:00:00-04:56</lastmod>
+<lastmod>2020-05-05T12:00:00-04:56</lastmod>
+<changefreq>hourly</changefreq>
+<priority>0.5</priority>
+</url>
+
+<url>
+<loc>https://kylekizirian.github.io/tag/jupyter.html</loc>
+<lastmod>2020-05-05T12:00:00-04:56</lastmod>
+<changefreq>hourly</changefreq>
+<priority>0.5</priority>
+</url>
+
+<url>
+<loc>https://kylekizirian.github.io/tag/matplotlib.html</loc>
+<lastmod>2020-05-05T12:00:00-04:56</lastmod>
 <changefreq>hourly</changefreq>
 <priority>0.5</priority>
 </url>
@@ -179,13 +207,6 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 </url>
 
 <url>
-<loc>https://kylekizirian.github.io/tag/jupyter.html</loc>
-<lastmod>2019-12-24T12:00:00-04:56</lastmod>
-<changefreq>hourly</changefreq>
-<priority>0.5</priority>
-</url>
-
-<url>
 <loc>https://kylekizirian.github.io/tag/euler.html</loc>
 <lastmod>2019-11-26T12:00:00-04:56</lastmod>
 <changefreq>hourly</changefreq>
@@ -194,7 +215,7 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>https://kylekizirian.github.io/author/kyle-kizirian.html</loc>
-<lastmod>2020-04-24T12:00:00-04:56</lastmod>
+<lastmod>2020-05-05T12:00:00-04:56</lastmod>
 <changefreq>hourly</changefreq>
 <priority>0.5</priority>
 </url>
