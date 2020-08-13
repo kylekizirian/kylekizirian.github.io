@@ -1655,7 +1655,9 @@ between $0$ and $1$.</p>
     <span class="n">graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="n">random_weight</span><span class="p">())</span>
 
 <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NUM_NODES</span> <span class="o">*</span> <span class="mi">5</span><span class="p">):</span>
-    <span class="n">graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">random_node</span><span class="p">(),</span> <span class="n">random_node</span><span class="p">(),</span> <span class="n">weight</span><span class="o">=</span><span class="n">random_weight</span><span class="p">())</span>
+    <span class="n">graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span>
+        <span class="n">random_node</span><span class="p">(),</span> <span class="n">random_node</span><span class="p">(),</span> <span class="n">weight</span><span class="o">=</span><span class="n">random_weight</span><span class="p">()</span>
+    <span class="p">)</span>
 
 <span class="n">pos</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">random_layout</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
 </pre></div>
@@ -1798,8 +1800,8 @@ added to the priority queue with:</p>
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">prims</span><span class="p">():</span>
     <span class="n">pqueue</span> <span class="o">=</span> <span class="n">PriorityQueue</span><span class="p">()</span>
 
-    <span class="c1"># Start at any random node and add all edges connected to this node</span>
-    <span class="c1"># to the priority queue.</span>
+    <span class="c1"># Start at any random node and add all edges connected to this</span>
+    <span class="c1"># node to the priority queue.</span>
     <span class="n">start_node</span> <span class="o">=</span> <span class="n">random_node</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">neighbor</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">neighbors</span><span class="p">(</span><span class="n">start_node</span><span class="p">):</span>
         <span class="n">edge_data</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">get_edge_data</span><span class="p">(</span><span class="n">start_node</span><span class="p">,</span> <span class="n">neighbor</span><span class="p">)</span>
@@ -1817,8 +1819,8 @@ added to the priority queue with:</p>
             <span class="n">new_node</span> <span class="o">=</span> <span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># If this edge connects two nodes that are already in the</span>
-            <span class="c1"># MST, then skip this and continue to the next edge in the </span>
-            <span class="c1"># priority queue.</span>
+            <span class="c1"># MST, then skip this and continue to the next edge in</span>
+            <span class="c1"># the priority queue.</span>
             <span class="k">continue</span>
 
         <span class="c1"># Every time a new node is added to the priority queue, add</span>
