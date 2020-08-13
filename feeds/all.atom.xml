@@ -1299,7 +1299,7 @@ sorted order (in this case, &lt;code&gt;(1, 5)&lt;/code&gt;).&lt;/p&gt;
 &lt;/div&gt;&lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
 &lt;p&gt;Finally, we're ready to implement Prim's algorithm. The algorithm
-works on the following principle - if you have a set of nodes edges
+works on the following principle - if you have a set of nodes and edges
 that you know are in the MST, then the edge with minimum weight that
 connects a node in the MST to a node not already in the MST is
 guaranteed to be in the MST.&lt;/p&gt;
