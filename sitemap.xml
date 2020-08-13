@@ -5,30 +5,37 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>https://kylekizirian.github.io/</loc>
-<lastmod>2020-05-05T22:00:39-00:00</lastmod>
+<lastmod>2020-08-13T13:48:12-00:00</lastmod>
 <changefreq>hourly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>https://kylekizirian.github.io/archives.html</loc>
-<lastmod>2020-05-05T22:00:39-00:00</lastmod>
+<lastmod>2020-08-13T13:48:12-00:00</lastmod>
 <changefreq>hourly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>https://kylekizirian.github.io/tags.html</loc>
-<lastmod>2020-05-05T22:00:39-00:00</lastmod>
+<lastmod>2020-08-13T13:48:12-00:00</lastmod>
 <changefreq>hourly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>https://kylekizirian.github.io/categories.html</loc>
-<lastmod>2020-05-05T22:00:39-00:00</lastmod>
+<lastmod>2020-08-13T13:48:12-00:00</lastmod>
 <changefreq>hourly</changefreq>
 <priority>0.5</priority>
+</url>
+
+<url>
+<loc>https://kylekizirian.github.io/prims-algorithm.html</loc>
+<lastmod>2020-08-13T12:00:00-04:00</lastmod>
+<changefreq>always</changefreq>
+<priority>1</priority>
 </url>
 
 <url>
@@ -124,7 +131,7 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>https://kylekizirian.github.io/category/python.html</loc>
-<lastmod>2020-03-15T12:00:00-04:56</lastmod>
+<lastmod>2020-08-13T12:00:00-04:56</lastmod>
 <changefreq>hourly</changefreq>
 <priority>0.5</priority>
 </url>
@@ -138,14 +145,14 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>https://kylekizirian.github.io/tag/python.html</loc>
-<lastmod>2020-05-05T12:00:00-04:56</lastmod>
+<lastmod>2020-08-13T12:00:00-04:56</lastmod>
 <changefreq>hourly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>https://kylekizirian.github.io/tag/jupyter.html</loc>
-<lastmod>2020-05-05T12:00:00-04:56</lastmod>
+<lastmod>2020-08-13T12:00:00-04:56</lastmod>
 <changefreq>hourly</changefreq>
 <priority>0.5</priority>
 </url>
@@ -215,7 +222,7 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>https://kylekizirian.github.io/author/kyle-kizirian.html</loc>
-<lastmod>2020-05-05T12:00:00-04:56</lastmod>
+<lastmod>2020-08-13T12:00:00-04:56</lastmod>
 <changefreq>hourly</changefreq>
 <priority>0.5</priority>
 </url>
