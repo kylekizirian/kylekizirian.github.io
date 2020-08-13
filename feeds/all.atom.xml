@@ -1468,7 +1468,7 @@ edges in the graph and the edges in the MST.&lt;/li&gt;
 
 &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;do_nothing&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
     &lt;span class="c1"&gt;# FuncAnimation requires an initialization function. We don&amp;#39;t&lt;/span&gt;
-    &lt;span class="c1"&gt;# any initialization, so we provide a no-op function.&lt;/span&gt;
+    &lt;span class="c1"&gt;# do any initialization, so we provide a no-op function.&lt;/span&gt;
     &lt;span class="k"&gt;pass&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
