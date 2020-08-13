@@ -1361,7 +1361,7 @@ has the next smallest weight and, after that, $(1, 4)$ which
 connects every node. The final MST is $(1, 2)$, $(1, 3)$, and
 $(1, 4)$.&lt;/p&gt;
 &lt;p&gt;Our example is simple, but in large graphs with many nodes and
-edges, the challenge is to efficiently find the edge with lowest
+edges, the challenge is to efficiently find the edge with the lowest
 weight. For this, Prim's algorithm uses a minimum priority queue
 which maintains the queue such that the next element returned
 always contains the smallest weight.&lt;/p&gt;
@@ -1416,11 +1416,11 @@ added to the priority queue with:&lt;/p&gt;
             &lt;span class="n"&gt;edge_weight&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;edge_data&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;weight&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
             &lt;span class="n"&gt;pqueue&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;put&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="n"&gt;edge_weight&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;new_node&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;neighbor&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
 
-        &lt;span class="c1"&gt;# Add this edge to the MST,&lt;/span&gt;
+        &lt;span class="c1"&gt;# Add this edge to the MST.&lt;/span&gt;
         &lt;span class="n"&gt;edges_in_mst&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;add&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;tuple&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;sorted&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;edge&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
         &lt;span class="n"&gt;nodes_on_mst&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;add&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;new_node&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 
-        &lt;span class="c1"&gt;# Yield edges currently in MST to plot in the animation.&lt;/span&gt;
+        &lt;span class="c1"&gt;# Yield edges in the MST to plot.&lt;/span&gt;
         &lt;span class="k"&gt;yield&lt;/span&gt; &lt;span class="n"&gt;edges_in_mst&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 

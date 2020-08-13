@@ -1773,7 +1773,7 @@ has the next smallest weight and, after that, $(1, 4)$ which
 connects every node. The final MST is $(1, 2)$, $(1, 3)$, and
 $(1, 4)$.</p>
 <p>Our example is simple, but in large graphs with many nodes and
-edges, the challenge is to efficiently find the edge with lowest
+edges, the challenge is to efficiently find the edge with the lowest
 weight. For this, Prim's algorithm uses a minimum priority queue
 which maintains the queue such that the next element returned
 always contains the smallest weight.</p>
@@ -1828,11 +1828,11 @@ added to the priority queue with:</p>
             <span class="n">edge_weight</span> <span class="o">=</span> <span class="n">edge_data</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span>
             <span class="n">pqueue</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">edge_weight</span><span class="p">,</span> <span class="p">(</span><span class="n">new_node</span><span class="p">,</span> <span class="n">neighbor</span><span class="p">)))</span>
 
-        <span class="c1"># Add this edge to the MST,</span>
+        <span class="c1"># Add this edge to the MST.</span>
         <span class="n">edges_in_mst</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">edge</span><span class="p">)))</span>
         <span class="n">nodes_on_mst</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">new_node</span><span class="p">)</span>
 
-        <span class="c1"># Yield edges currently in MST to plot in the animation.</span>
+        <span class="c1"># Yield edges in the MST to plot.</span>
         <span class="k">yield</span> <span class="n">edges_in_mst</span>
 </pre></div>
 
