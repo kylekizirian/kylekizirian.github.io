@@ -1375,7 +1375,7 @@ edge's weight and &lt;code&gt;element&lt;/code&gt; is the tuple representing the
 For example, the edge $(1, 2)$ with a weight of $0.5$ would be
 added to the priority queue with:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;pqueue.put((0.5, (1, 2))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;pqueue.put((0.5, (1, 2)))&lt;/code&gt;&lt;/pre&gt;
 
 &lt;/div&gt;
 &lt;/div&gt;
