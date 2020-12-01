@@ -1,0 +1,2184 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="author" content="Kyle Kizirian">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+        <title>Visualizing the growth of a codebase with git and tokei | Kizirian</title>
+
+	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+	<link rel="icon" href="/favicon.ico" type="image/x-icon">
+        <link rel="alternate" type="application/atom+xml" title="Kizirian blog atom feed" href="/feeds/all.atom.xml" />
+        <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700' rel='stylesheet' type='text/css'>
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="/theme/css/icons.css"/>
+        <style>.highlight .hll { background-color: #ffffcc }
+.highlight .c { color: #60a0b0; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #007020; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #60a0b0; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #007020 } /* Comment.Preproc */
+.highlight .c1 { color: #60a0b0; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #60a0b0; background-color: #fff0f0 } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #808080 } /* Generic.Output */
+.highlight .gp { color: #c65d09; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0040D0 } /* Generic.Traceback */
+.highlight .kc { color: #007020; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #007020; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #007020; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #007020 } /* Keyword.Pseudo */
+.highlight .kr { color: #007020; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #902000 } /* Keyword.Type */
+.highlight .m { color: #40a070 } /* Literal.Number */
+.highlight .s { color: #4070a0 } /* Literal.String */
+.highlight .na { color: #4070a0 } /* Name.Attribute */
+.highlight .nb { color: #007020 } /* Name.Builtin */
+.highlight .nc { color: #0e84b5; font-weight: bold } /* Name.Class */
+.highlight .no { color: #60add5 } /* Name.Constant */
+.highlight .nd { color: #555555; font-weight: bold } /* Name.Decorator */
+.highlight .ni { color: #d55537; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #007020 } /* Name.Exception */
+.highlight .nf { color: #06287e } /* Name.Function */
+.highlight .nl { color: #002070; font-weight: bold } /* Name.Label */
+.highlight .nn { color: #0e84b5; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #062873; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #bb60d5 } /* Name.Variable */
+.highlight .ow { color: #007020; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #40a070 } /* Literal.Number.Float */
+.highlight .mh { color: #40a070 } /* Literal.Number.Hex */
+.highlight .mi { color: #40a070 } /* Literal.Number.Integer */
+.highlight .mo { color: #40a070 } /* Literal.Number.Oct */
+.highlight .sb { color: #4070a0 } /* Literal.String.Backtick */
+.highlight .sc { color: #4070a0 } /* Literal.String.Char */
+.highlight .sd { color: #4070a0; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #4070a0 } /* Literal.String.Double */
+.highlight .se { color: #4070a0; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #4070a0 } /* Literal.String.Heredoc */
+.highlight .si { color: #70a0d0; font-style: italic } /* Literal.String.Interpol */
+.highlight .sx { color: #c65d09 } /* Literal.String.Other */
+.highlight .sr { color: #235388 } /* Literal.String.Regex */
+.highlight .s1 { color: #4070a0 } /* Literal.String.Single */
+.highlight .ss { color: #517918 } /* Literal.String.Symbol */
+.highlight .bp { color: #007020 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #bb60d5 } /* Name.Variable.Class */
+.highlight .vg { color: #bb60d5 } /* Name.Variable.Global */
+.highlight .vi { color: #bb60d5 } /* Name.Variable.Instance */
+.highlight .il { color: #40a070 } /* Literal.Number.Integer.Long */</style>
+        <style>body {
+  margin: 0;
+  padding: 0;
+  font: 15px 'Source Sans Pro', sans-serif;
+  line-height: 1.6em;
+  color: #222;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+a {
+  color: #007EE5;
+  text-decoration: none;
+}
+a:hover {
+  color: #007EE5;
+  text-decoration: none;
+}
+header.main-header {
+  background: none repeat scroll 0% 0% #205F29;
+  margin-bottom: 0px;
+}
+header.main-header a {
+  color: #fff;
+}
+header.main-header .container {
+  max-width: 1000px;
+}
+header.main-header .container nav a:hover {
+  background-color: #5C881C;
+}
+article {
+  margin: 0;
+}
+article header.about {
+  margin-bottom: 0px;
+  padding-bottom: 0px;
+}
+article header {
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+}
+article header h1 {
+  margin-bottom: 2px;
+  font-weight: 700;
+  color: #000;
+}
+article header time {
+  color: #9E9E9E;
+  font-size: 0.85em;
+  float: right;
+}
+article header time.left {
+  color: #9E9E9E;
+  font-size: 0.85em;
+  float: left;
+}
+article div.social-links ul {
+  padding: 0px;
+}
+article div.social-links li {
+  display: inline;
+  font-size: 20px;
+}
+article div.social-links li a {
+  color: #000;
+  padding: 10px;
+}
+article div.social-links li a:hover {
+  color: #666;
+  text-decoration: none;
+}
+article p {
+  font-size: 16px;
+  margin-bottom: 20px;
+  line-height: 1.6em;
+}
+article p.note {
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  padding: 0.533em 0.733em;
+}
+article p.update {
+  background-color: #FEEFB3;
+  border: 1px solid #e6e68a;
+  padding: 0.533em 0.733em;
+}
+article p.alert {
+  background-color: #ffe2e2;
+  border: 1px solid #ffb2b2;
+  padding: 0.533em 0.733em;
+}
+article ul,
+article ol {
+  margin-top: 0px;
+  margin-bottom: 25px;
+}
+article li {
+  font-size: 16px;
+  line-height: 1.6em;
+}
+article a:hover {
+  text-decoration: underline;
+}
+article blockquote {
+  border-left: 2px solid #c7c7cc;
+  color: #666;
+  margin: 30px 0;
+  padding: 0 0 0 25px;
+}
+article img {
+  max-width: 100%;
+}
+article code {
+  color: #333;
+  background-color: #EEE;
+  border-radius: 0;
+  font-size: 13px;
+}
+article .meta {
+  font-size: 11px;
+}
+article .meta a:hover {
+  text-decoration: none;
+}
+article .meta div {
+  margin-bottom: 20px;
+  display: block;
+}
+article .meta a.tag {
+  margin: 0 10px 10px 0;
+  padding: 1px 12px;
+  display: inline-block;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.05);
+}
+article .meta a.tag:hover {
+  background: rgba(0, 0, 0, 0.15);
+}
+article .meta a.read_more,
+article .meta a.comments_btn {
+  font-size: 14px;
+  font-weight: 800;
+  padding: 10px 20px;
+  color: #205F29;
+  background: #FFF;
+  border: 1px solid #205F29;
+}
+article .meta a.read_more:hover,
+article .meta a.comments_btn:hover {
+  color: #FFF;
+  background: #5C881C;
+}
+.index {
+  max-width: 700px;
+}
+.index article header h2 {
+  font-size: 36px;
+  margin-bottom: 2px;
+  font-weight: 700;
+}
+.index article header h2 a {
+  color: #000;
+}
+.index article header h2 a:hover {
+  color: #007EE5;
+  text-decoration: none;
+}
+.index .separator {
+  padding: 40px 0 0 0;
+  margin: 0 0 40px 0;
+  height: 10px;
+  border-bottom: solid 1px #CCC;
+}
+.index .pagination {
+  display: block;
+  margin-bottom: 100px;
+}
+.index .pagination .left {
+  text-align: right;
+}
+.index .pagination .right {
+  text-align: left;
+}
+.index .pagination a {
+  display: inline-block;
+  border: 2px solid #5C881C;
+  margin: 0 5px;
+  padding: 8px 20px;
+  font-weight: bold;
+  color: #5C881C;
+}
+.index .pagination a:hover {
+  color: #FFF;
+  background: #5C881C;
+}
+.post {
+  max-width: 700px;
+}
+.post h2:before {
+  content: "# ";
+  font-weight: bold;
+  color: #DDD;
+}
+.post h3:before {
+  content: "## ";
+  font-weight: bold;
+  color: #DDD;
+}
+.post h4:before {
+  content: "### ";
+  font-weight: bold;
+  color: #DDD;
+}
+.post article .meta {
+  margin: 50px 0 100px;
+}
+.list {
+  max-width: 700px;
+}
+.list ul.double-list {
+  margin: 0 auto 60px;
+  padding: 0;
+  list-style-type: none;
+}
+.list ul.double-list li {
+  padding: 5px 0;
+}
+.list ul.double-list li h2 {
+  font-size: 1em;
+  display: inline;
+  font-weight: normal;
+}
+.list ul.double-list li span {
+  font-family: sans-serif;
+  /* text-transform: uppercase; */
+  text-align: right;
+  float: right;
+  padding-top: 3px;
+  font-size: 12px;
+  color: #999;
+}
+.full-width-content {
+  padding-top: 10px;
+  padding-left: 0px;
+  padding-right: 0px;
+  margin-left: -20px;
+  margin-right: -20px;
+}
+.col-xs-1,
+.col-sm-1,
+.col-md-1,
+.col-lg-1,
+.col-xs-2,
+.col-sm-2,
+.col-md-2,
+.col-lg-2,
+.col-xs-3,
+.col-sm-3,
+.col-md-3,
+.col-lg-3,
+.col-xs-4,
+.col-sm-4,
+.col-md-4,
+.col-lg-4,
+.col-xs-5,
+.col-sm-5,
+.col-md-5,
+.col-lg-5,
+.col-xs-6,
+.col-sm-6,
+.col-md-6,
+.col-lg-6,
+.col-xs-7,
+.col-sm-7,
+.col-md-7,
+.col-lg-7,
+.col-xs-8,
+.col-sm-8,
+.col-md-8,
+.col-lg-8,
+.col-xs-9,
+.col-sm-9,
+.col-md-9,
+.col-lg-9,
+.col-xs-10,
+.col-sm-10,
+.col-md-10,
+.col-lg-10,
+.col-xs-11,
+.col-sm-11,
+.col-md-11,
+.col-lg-11,
+.col-xs-12,
+.col-sm-12,
+.col-md-12,
+.col-lg-12 {
+  padding-right: 0px;
+  padding-left: 0px;
+}</style>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+
+    </head>
+
+    <body>
+        <header class="navbar navbar-inverse bs-docs-nav">
+            <div class="container-fluid">
+                <div class="navbar-header">
+		  <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#theNavbar">
+		    <span class="icon-bar"></span>
+		    <span class="icon-bar"></span>
+		    <span class="icon-bar"></span> 
+		  </button>
+                  <a class="navbar-brand" href="/" title="Home" class="title">Kizirian</a>
+                </div>
+                <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation" id="theNavbar">
+		    <ul class="nav navbar-nav navbar-right">
+                            <li><a href="about.html" title="About">About</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <div id="wrap">
+<div class="container post">
+    <article>
+        <header>
+            <h1>Visualizing the growth of a codebase with git and tokei</h1>
+            <time datetime="article.date.isoformat()" pubdate>Tue 01 December 2020</time>
+        </header>
+
+        <div class="article_content">
+            <style type="text/css">/*!
+*
+* IPython notebook
+*
+*/
+/* CSS font colors for translated ANSI escape sequences */
+/* The color values are a mix of
+   http://www.xcolors.net/dl/baskerville-ivorylight and
+   http://www.xcolors.net/dl/euphrasia */
+.ansi-black-fg {
+  color: #3E424D;
+}
+.ansi-black-bg {
+  background-color: #3E424D;
+}
+.ansi-black-intense-fg {
+  color: #282C36;
+}
+.ansi-black-intense-bg {
+  background-color: #282C36;
+}
+.ansi-red-fg {
+  color: #E75C58;
+}
+.ansi-red-bg {
+  background-color: #E75C58;
+}
+.ansi-red-intense-fg {
+  color: #B22B31;
+}
+.ansi-red-intense-bg {
+  background-color: #B22B31;
+}
+.ansi-green-fg {
+  color: #00A250;
+}
+.ansi-green-bg {
+  background-color: #00A250;
+}
+.ansi-green-intense-fg {
+  color: #007427;
+}
+.ansi-green-intense-bg {
+  background-color: #007427;
+}
+.ansi-yellow-fg {
+  color: #DDB62B;
+}
+.ansi-yellow-bg {
+  background-color: #DDB62B;
+}
+.ansi-yellow-intense-fg {
+  color: #B27D12;
+}
+.ansi-yellow-intense-bg {
+  background-color: #B27D12;
+}
+.ansi-blue-fg {
+  color: #208FFB;
+}
+.ansi-blue-bg {
+  background-color: #208FFB;
+}
+.ansi-blue-intense-fg {
+  color: #0065CA;
+}
+.ansi-blue-intense-bg {
+  background-color: #0065CA;
+}
+.ansi-magenta-fg {
+  color: #D160C4;
+}
+.ansi-magenta-bg {
+  background-color: #D160C4;
+}
+.ansi-magenta-intense-fg {
+  color: #A03196;
+}
+.ansi-magenta-intense-bg {
+  background-color: #A03196;
+}
+.ansi-cyan-fg {
+  color: #60C6C8;
+}
+.ansi-cyan-bg {
+  background-color: #60C6C8;
+}
+.ansi-cyan-intense-fg {
+  color: #258F8F;
+}
+.ansi-cyan-intense-bg {
+  background-color: #258F8F;
+}
+.ansi-white-fg {
+  color: #C5C1B4;
+}
+.ansi-white-bg {
+  background-color: #C5C1B4;
+}
+.ansi-white-intense-fg {
+  color: #A1A6B2;
+}
+.ansi-white-intense-bg {
+  background-color: #A1A6B2;
+}
+.ansi-default-inverse-fg {
+  color: #FFFFFF;
+}
+.ansi-default-inverse-bg {
+  background-color: #000000;
+}
+.ansi-bold {
+  font-weight: bold;
+}
+.ansi-underline {
+  text-decoration: underline;
+}
+/* The following styles are deprecated an will be removed in a future version */
+.ansibold {
+  font-weight: bold;
+}
+.ansi-inverse {
+  outline: 0.5px dotted;
+}
+/* use dark versions for foreground, to improve visibility */
+.ansiblack {
+  color: black;
+}
+.ansired {
+  color: darkred;
+}
+.ansigreen {
+  color: darkgreen;
+}
+.ansiyellow {
+  color: #c4a000;
+}
+.ansiblue {
+  color: darkblue;
+}
+.ansipurple {
+  color: darkviolet;
+}
+.ansicyan {
+  color: steelblue;
+}
+.ansigray {
+  color: gray;
+}
+/* and light for background, for the same reason */
+.ansibgblack {
+  background-color: black;
+}
+.ansibgred {
+  background-color: red;
+}
+.ansibggreen {
+  background-color: green;
+}
+.ansibgyellow {
+  background-color: yellow;
+}
+.ansibgblue {
+  background-color: blue;
+}
+.ansibgpurple {
+  background-color: magenta;
+}
+.ansibgcyan {
+  background-color: cyan;
+}
+.ansibggray {
+  background-color: gray;
+}
+div.cell {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  border-radius: 2px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  border-width: 1px;
+  border-style: solid;
+  border-color: transparent;
+  width: 100%;
+  padding: 5px;
+  /* This acts as a spacer between cells, that is outside the border */
+  margin: 0px;
+  outline: none;
+  position: relative;
+  overflow: visible;
+}
+div.cell:before {
+  position: absolute;
+  display: block;
+  top: -1px;
+  left: -1px;
+  width: 5px;
+  height: calc(100% +  2px);
+  content: '';
+  background: transparent;
+}
+div.cell.jupyter-soft-selected {
+  border-left-color: #E3F2FD;
+  border-left-width: 1px;
+  padding-left: 5px;
+  border-right-color: #E3F2FD;
+  border-right-width: 1px;
+  background: #E3F2FD;
+}
+@media print {
+  div.cell.jupyter-soft-selected {
+    border-color: transparent;
+  }
+}
+div.cell.selected,
+div.cell.selected.jupyter-soft-selected {
+  border-color: #ababab;
+}
+div.cell.selected:before,
+div.cell.selected.jupyter-soft-selected:before {
+  position: absolute;
+  display: block;
+  top: -1px;
+  left: -1px;
+  width: 5px;
+  height: calc(100% +  2px);
+  content: '';
+  background: #42A5F5;
+}
+@media print {
+  div.cell.selected,
+  div.cell.selected.jupyter-soft-selected {
+    border-color: transparent;
+  }
+}
+.edit_mode div.cell.selected {
+  border-color: #66BB6A;
+}
+.edit_mode div.cell.selected:before {
+  position: absolute;
+  display: block;
+  top: -1px;
+  left: -1px;
+  width: 5px;
+  height: calc(100% +  2px);
+  content: '';
+  background: #66BB6A;
+}
+@media print {
+  .edit_mode div.cell.selected {
+    border-color: transparent;
+  }
+}
+.prompt {
+  /* This needs to be wide enough for 3 digit prompt numbers: In[100]: */
+  min-width: 14ex;
+  /* This padding is tuned to match the padding on the CodeMirror editor. */
+  padding: 0.4em;
+  margin: 0px;
+  font-family: monospace;
+  text-align: right;
+  /* This has to match that of the the CodeMirror class line-height below */
+  line-height: 1.21429em;
+  /* Don't highlight prompt number selection */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  /* Use default cursor */
+  cursor: default;
+}
+@media (max-width: 540px) {
+  .prompt {
+    text-align: left;
+  }
+}
+div.inner_cell {
+  min-width: 0;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  /* Old browsers */
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  box-flex: 1;
+  /* Modern browsers */
+  flex: 1;
+}
+/* input_area and input_prompt must match in top border and margin for alignment */
+div.input_area {
+  border: 1px solid #cfcfcf;
+  border-radius: 2px;
+  background: #f7f7f7;
+  line-height: 1.21429em;
+}
+/* This is needed so that empty prompt areas can collapse to zero height when there
+   is no content in the output_subarea and the prompt. The main purpose of this is
+   to make sure that empty JavaScript output_subareas have no height. */
+div.prompt:empty {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+div.unrecognized_cell {
+  padding: 5px 5px 5px 0px;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+div.unrecognized_cell .inner_cell {
+  border-radius: 2px;
+  padding: 5px;
+  font-weight: bold;
+  color: red;
+  border: 1px solid #cfcfcf;
+  background: #eaeaea;
+}
+div.unrecognized_cell .inner_cell a {
+  color: inherit;
+  text-decoration: none;
+}
+div.unrecognized_cell .inner_cell a:hover {
+  color: inherit;
+  text-decoration: none;
+}
+@media (max-width: 540px) {
+  div.unrecognized_cell > div.prompt {
+    display: none;
+  }
+}
+div.code_cell {
+  /* avoid page breaking on code cells when printing */
+}
+@media print {
+  div.code_cell {
+    page-break-inside: avoid;
+  }
+}
+/* any special styling for code cells that are currently running goes here */
+div.input {
+  page-break-inside: avoid;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.input {
+    /* Old browsers */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-box-align: stretch;
+    display: -moz-box;
+    -moz-box-orient: vertical;
+    -moz-box-align: stretch;
+    display: box;
+    box-orient: vertical;
+    box-align: stretch;
+    /* Modern browsers */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+/* input_area and input_prompt must match in top border and margin for alignment */
+div.input_prompt {
+  color: #303F9F;
+  border-top: 1px solid transparent;
+}
+div.input_area > div.highlight {
+  margin: 0.4em;
+  border: none;
+  padding: 0px;
+  background-color: transparent;
+}
+div.input_area > div.highlight > pre {
+  margin: 0px;
+  border: none;
+  padding: 0px;
+  background-color: transparent;
+}
+/* The following gets added to the <head> if it is detected that the user has a
+ * monospace font with inconsistent normal/bold/italic height.  See
+ * notebookmain.js.  Such fonts will have keywords vertically offset with
+ * respect to the rest of the text.  The user should select a better font.
+ * See: https://github.com/ipython/ipython/issues/1503
+ *
+ * .CodeMirror span {
+ *      vertical-align: bottom;
+ * }
+ */
+.CodeMirror {
+  line-height: 1.21429em;
+  /* Changed from 1em to our global default */
+  font-size: 14px;
+  height: auto;
+  /* Changed to auto to autogrow */
+  background: none;
+  /* Changed from white to allow our bg to show through */
+}
+.CodeMirror-scroll {
+  /*  The CodeMirror docs are a bit fuzzy on if overflow-y should be hidden or visible.*/
+  /*  We have found that if it is visible, vertical scrollbars appear with font size changes.*/
+  overflow-y: hidden;
+  overflow-x: auto;
+}
+.CodeMirror-lines {
+  /* In CM2, this used to be 0.4em, but in CM3 it went to 4px. We need the em value because */
+  /* we have set a different line-height and want this to scale with that. */
+  /* Note that this should set vertical padding only, since CodeMirror assumes
+       that horizontal padding will be set on CodeMirror pre */
+  padding: 0.4em 0;
+}
+.CodeMirror-linenumber {
+  padding: 0 8px 0 4px;
+}
+.CodeMirror-gutters {
+  border-bottom-left-radius: 2px;
+  border-top-left-radius: 2px;
+}
+.CodeMirror pre {
+  /* In CM3 this went to 4px from 0 in CM2. This sets horizontal padding only,
+    use .CodeMirror-lines for vertical */
+  padding: 0 0.4em;
+  border: 0;
+  border-radius: 0;
+}
+.CodeMirror-cursor {
+  border-left: 1.4px solid black;
+}
+@media screen and (min-width: 2138px) and (max-width: 4319px) {
+  .CodeMirror-cursor {
+    border-left: 2px solid black;
+  }
+}
+@media screen and (min-width: 4320px) {
+  .CodeMirror-cursor {
+    border-left: 4px solid black;
+  }
+}
+/*
+
+Original style from softwaremaniacs.org (c) Ivan Sagalaev <Maniac@SoftwareManiacs.Org>
+Adapted from GitHub theme
+
+*/
+.highlight-base {
+  color: #000;
+}
+.highlight-variable {
+  color: #000;
+}
+.highlight-variable-2 {
+  color: #1a1a1a;
+}
+.highlight-variable-3 {
+  color: #333333;
+}
+.highlight-string {
+  color: #BA2121;
+}
+.highlight-comment {
+  color: #408080;
+  font-style: italic;
+}
+.highlight-number {
+  color: #080;
+}
+.highlight-atom {
+  color: #88F;
+}
+.highlight-keyword {
+  color: #008000;
+  font-weight: bold;
+}
+.highlight-builtin {
+  color: #008000;
+}
+.highlight-error {
+  color: #f00;
+}
+.highlight-operator {
+  color: #AA22FF;
+  font-weight: bold;
+}
+.highlight-meta {
+  color: #AA22FF;
+}
+/* previously not defined, copying from default codemirror */
+.highlight-def {
+  color: #00f;
+}
+.highlight-string-2 {
+  color: #f50;
+}
+.highlight-qualifier {
+  color: #555;
+}
+.highlight-bracket {
+  color: #997;
+}
+.highlight-tag {
+  color: #170;
+}
+.highlight-attribute {
+  color: #00c;
+}
+.highlight-header {
+  color: blue;
+}
+.highlight-quote {
+  color: #090;
+}
+.highlight-link {
+  color: #00c;
+}
+/* apply the same style to codemirror */
+.cm-s-ipython span.cm-keyword {
+  color: #008000;
+  font-weight: bold;
+}
+.cm-s-ipython span.cm-atom {
+  color: #88F;
+}
+.cm-s-ipython span.cm-number {
+  color: #080;
+}
+.cm-s-ipython span.cm-def {
+  color: #00f;
+}
+.cm-s-ipython span.cm-variable {
+  color: #000;
+}
+.cm-s-ipython span.cm-operator {
+  color: #AA22FF;
+  font-weight: bold;
+}
+.cm-s-ipython span.cm-variable-2 {
+  color: #1a1a1a;
+}
+.cm-s-ipython span.cm-variable-3 {
+  color: #333333;
+}
+.cm-s-ipython span.cm-comment {
+  color: #408080;
+  font-style: italic;
+}
+.cm-s-ipython span.cm-string {
+  color: #BA2121;
+}
+.cm-s-ipython span.cm-string-2 {
+  color: #f50;
+}
+.cm-s-ipython span.cm-meta {
+  color: #AA22FF;
+}
+.cm-s-ipython span.cm-qualifier {
+  color: #555;
+}
+.cm-s-ipython span.cm-builtin {
+  color: #008000;
+}
+.cm-s-ipython span.cm-bracket {
+  color: #997;
+}
+.cm-s-ipython span.cm-tag {
+  color: #170;
+}
+.cm-s-ipython span.cm-attribute {
+  color: #00c;
+}
+.cm-s-ipython span.cm-header {
+  color: blue;
+}
+.cm-s-ipython span.cm-quote {
+  color: #090;
+}
+.cm-s-ipython span.cm-link {
+  color: #00c;
+}
+.cm-s-ipython span.cm-error {
+  color: #f00;
+}
+.cm-s-ipython span.cm-tab {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAMCAYAAAAkuj5RAAAAAXNSR0IArs4c6QAAAGFJREFUSMft1LsRQFAQheHPowAKoACx3IgEKtaEHujDjORSgWTH/ZOdnZOcM/sgk/kFFWY0qV8foQwS4MKBCS3qR6ixBJvElOobYAtivseIE120FaowJPN75GMu8j/LfMwNjh4HUpwg4LUAAAAASUVORK5CYII=);
+  background-position: right;
+  background-repeat: no-repeat;
+}
+div.output_wrapper {
+  /* this position must be relative to enable descendents to be absolute within it */
+  position: relative;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  z-index: 1;
+}
+/* class for the output area when it should be height-limited */
+div.output_scroll {
+  /* ideally, this would be max-height, but FF barfs all over that */
+  height: 24em;
+  /* FF needs this *and the wrapper* to specify full width, or it will shrinkwrap */
+  width: 100%;
+  overflow: auto;
+  border-radius: 2px;
+  -webkit-box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+  display: block;
+}
+/* output div while it is collapsed */
+div.output_collapsed {
+  margin: 0px;
+  padding: 0px;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+div.out_prompt_overlay {
+  height: 100%;
+  padding: 0px 0.4em;
+  position: absolute;
+  border-radius: 2px;
+}
+div.out_prompt_overlay:hover {
+  /* use inner shadow to get border that is computed the same on WebKit/FF */
+  -webkit-box-shadow: inset 0 0 1px #000;
+  box-shadow: inset 0 0 1px #000;
+  background: rgba(240, 240, 240, 0.5);
+}
+div.output_prompt {
+  color: #D84315;
+}
+/* This class is the outer container of all output sections. */
+div.output_area {
+  padding: 0px;
+  page-break-inside: avoid;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+div.output_area .MathJax_Display {
+  text-align: left !important;
+}
+div.output_area 
+div.output_area 
+div.output_area img,
+div.output_area svg {
+  max-width: 100%;
+  height: auto;
+}
+div.output_area img.unconfined,
+div.output_area svg.unconfined {
+  max-width: none;
+}
+div.output_area .mglyph > img {
+  max-width: none;
+}
+/* This is needed to protect the pre formating from global settings such
+   as that of bootstrap */
+.output {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.output_area {
+    /* Old browsers */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-box-align: stretch;
+    display: -moz-box;
+    -moz-box-orient: vertical;
+    -moz-box-align: stretch;
+    display: box;
+    box-orient: vertical;
+    box-align: stretch;
+    /* Modern browsers */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+div.output_area pre {
+  margin: 0;
+  padding: 1px 0 1px 0;
+  border: 0;
+  vertical-align: baseline;
+  color: black;
+  background-color: transparent;
+  border-radius: 0;
+}
+/* This class is for the output subarea inside the output_area and after
+   the prompt div. */
+div.output_subarea {
+  overflow-x: auto;
+  padding: 0.4em;
+  /* Old browsers */
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  box-flex: 1;
+  /* Modern browsers */
+  flex: 1;
+  max-width: calc(100% - 14ex);
+}
+div.output_scroll div.output_subarea {
+  overflow-x: visible;
+}
+/* The rest of the output_* classes are for special styling of the different
+   output types */
+/* all text output has this class: */
+div.output_text {
+  text-align: left;
+  color: #000;
+  /* This has to match that of the the CodeMirror class line-height below */
+  line-height: 1.21429em;
+}
+/* stdout/stderr are 'text' as well as 'stream', but execute_result/error are *not* streams */
+div.output_stderr {
+  background: #fdd;
+  /* very light red background for stderr */
+}
+div.output_latex {
+  text-align: left;
+}
+/* Empty output_javascript divs should have no height */
+div.output_javascript:empty {
+  padding: 0;
+}
+.js-error {
+  color: darkred;
+}
+/* raw_input styles */
+div.raw_input_container {
+  line-height: 1.21429em;
+  padding-top: 5px;
+}
+pre.raw_input_prompt {
+  /* nothing needed here. */
+}
+input.raw_input {
+  font-family: monospace;
+  font-size: inherit;
+  color: inherit;
+  width: auto;
+  /* make sure input baseline aligns with prompt */
+  vertical-align: baseline;
+  /* padding + margin = 0.5em between prompt and cursor */
+  padding: 0em 0.25em;
+  margin: 0em 0.25em;
+}
+input.raw_input:focus {
+  box-shadow: none;
+}
+p.p-space {
+  margin-bottom: 10px;
+}
+div.output_unrecognized {
+  padding: 5px;
+  font-weight: bold;
+  color: red;
+}
+div.output_unrecognized a {
+  color: inherit;
+  text-decoration: none;
+}
+div.output_unrecognized a:hover {
+  color: inherit;
+  text-decoration: none;
+}
+.rendered_html {
+  color: #000;
+  /* any extras will just be numbers: */
+}
+
+
+
+.rendered_html :link {
+  text-decoration: underline;
+}
+.rendered_html :visited {
+  text-decoration: underline;
+}
+
+
+
+
+
+
+.rendered_html h1:first-child {
+  margin-top: 0.538em;
+}
+.rendered_html h2:first-child {
+  margin-top: 0.636em;
+}
+.rendered_html h3:first-child {
+  margin-top: 0.777em;
+}
+.rendered_html h4:first-child {
+  margin-top: 1em;
+}
+.rendered_html h5:first-child {
+  margin-top: 1em;
+}
+.rendered_html h6:first-child {
+  margin-top: 1em;
+}
+.rendered_html ul:not(.list-inline),
+.rendered_html ol:not(.list-inline) {
+  padding-left: 2em;
+}
+
+
+
+
+
+
+
+
+.rendered_html * + ul {
+  margin-top: 1em;
+}
+.rendered_html * + ol {
+  margin-top: 1em;
+}
+
+
+
+
+
+.rendered_html pre,
+
+
+
+
+.rendered_html tr,
+.rendered_html th,
+
+
+.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+.rendered_html * + table {
+  margin-top: 1em;
+}
+
+.rendered_html * + p {
+  margin-top: 1em;
+}
+
+.rendered_html * + img {
+  margin-top: 1em;
+}
+.rendered_html img,
+
+.rendered_html img.unconfined,
+
+
+.rendered_html * + .alert {
+  margin-top: 1em;
+}
+[dir="rtl"] 
+div.text_cell {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.text_cell > div.prompt {
+    display: none;
+  }
+}
+div.text_cell_render {
+  /*font-family: "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif;*/
+  outline: none;
+  resize: none;
+  width: inherit;
+  border-style: none;
+  padding: 0.5em 0.5em 0.5em 0.4em;
+  color: #000;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+a.anchor-link:link {
+  text-decoration: none;
+  padding: 0px 20px;
+  visibility: hidden;
+}
+h1:hover .anchor-link,
+h2:hover .anchor-link,
+h3:hover .anchor-link,
+h4:hover .anchor-link,
+h5:hover .anchor-link,
+h6:hover .anchor-link {
+  visibility: visible;
+}
+.text_cell.rendered .input_area {
+  display: none;
+}
+.text_cell.rendered 
+.text_cell.rendered .rendered_html tr,
+.text_cell.rendered .rendered_html th,
+.text_cell.rendered 
+.text_cell.unrendered .text_cell_render {
+  display: none;
+}
+.text_cell .dropzone .input_area {
+  border: 2px dashed #bababa;
+  margin: -1px;
+}
+.cm-header-1,
+.cm-header-2,
+.cm-header-3,
+.cm-header-4,
+.cm-header-5,
+.cm-header-6 {
+  font-weight: bold;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.cm-header-1 {
+  font-size: 185.7%;
+}
+.cm-header-2 {
+  font-size: 157.1%;
+}
+.cm-header-3 {
+  font-size: 128.6%;
+}
+.cm-header-4 {
+  font-size: 110%;
+}
+.cm-header-5 {
+  font-size: 100%;
+  font-style: italic;
+}
+.cm-header-6 {
+  font-size: 100%;
+  font-style: italic;
+}
+</style>
+<style type="text/css">.highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .ch { color: #408080; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .cpf { color: #408080; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mb { color: #666666 } /* Literal.Number.Bin */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sa { color: #BA2121 } /* Literal.String.Affix */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .dl { color: #BA2121 } /* Literal.String.Delimiter */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #0000FF } /* Name.Function.Magic */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .vm { color: #19177C } /* Name.Variable.Magic */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */</style><div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a href="https://github.com/XAMPPRocky/tokei">tokei</a> is a neat tool for
+providing statistics on a codebase. Let's look at it run over
+the source code of git.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">git_repo</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;code&quot;</span> <span class="o">/</span> <span class="s2">&quot;git&quot;</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tokei_run</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+    <span class="p">[</span><span class="s2">&quot;tokei&quot;</span><span class="p">],</span>
+    <span class="n">cwd</span><span class="o">=</span><span class="n">git_repo</span><span class="p">,</span>
+    <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+    <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">tokei_run</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>===============================================================================
+ Language            Files        Lines         Code     Comments       Blanks
+===============================================================================
+ ASP.NET                 9         1083          942            0          141
+ GNU Style Assembly      1          224           98          100           26
+ Autoconf                9          128          108            3           17
+ BASH                    1         3585         2866          431          288
+ Batch                   3          287          117          118           52
+ C                     475       284504       220346        29119        35039
+ C Header              228        36873        18580        13629         4664
+ CMake                   1          988          779           50          159
+ CSS                     2          982          783           30          169
+ Emacs Lisp              2           12           12            0            0
+ Go                      4          558          421           84           53
+ JavaScript              3         1065          513          411          141
+ Makefile               23         5191         3681          799          711
+ Markdown                4          347            0          262           85
+ Perl                   49        14057        11029         1183         1845
+ Python                  4         9116         7047          690         1379
+ ReStructuredText        6         1142          892            0          250
+ Ruby                    1           48           43            0            5
+ Shell                1127       261148       223343        11951        25854
+ TCL                     1           29           25            0            4
+ Plain Text            750       109999            0        86528        23471
+ XSL                     6           95           68           16           11
+ Zsh                     1          246          191           18           37
+===============================================================================
+ Total                2710       731707       491884       145422        94401
+===============================================================================
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>It's rather amazing that the source code contains nearly
+300,000 lines of C code and just as many lines of shell scripts.
+It's also interesting to consider how that's changed over
+time. We can look at this by analyzing each version of git and
+plotting its growth.</p>
+<p>Let's start by looking at the tags in git's history with the
+<code>git tag</code> command.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">git_tag</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+    <span class="p">[</span><span class="s2">&quot;git&quot;</span><span class="p">,</span> <span class="s2">&quot;tag&quot;</span><span class="p">],</span>
+    <span class="n">cwd</span><span class="o">=</span><span class="n">git_repo</span><span class="p">,</span>
+    <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+    <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">tags</span> <span class="o">=</span> <span class="n">git_tag</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Analyzing the tags shows a few things in the raw tag output
+that we'd like to fix. One is that there are a number of tags
+for gitgui versions that we're not really interested in.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tags</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[5]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[&#39;gitgui-0.10.0&#39;, &#39;gitgui-0.10.1&#39;, &#39;gitgui-0.10.2&#39;]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Another thing that we'll want to fix is that git tags are printed in
+alphanumeric order, which means that the tag v2.19 comes before v2.2
+even though it's a later version number.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tags</span><span class="p">[</span><span class="mi">619</span><span class="p">:</span><span class="mi">624</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[6]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[&#39;v2.19.3&#39;, &#39;v2.19.4&#39;, &#39;v2.19.5&#39;, &#39;v2.2.0&#39;, &#39;v2.2.0-rc0&#39;]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><code>git tag</code> provides two handy switches to resolve this. The first is
+<code>--list pattern</code> which only lists tags that match the given pattern.
+The pattern <code>v[0-9].[0-9]*.0</code> only matches tags that start with a v,
+followed by a single digit, followed by a period, followed by one or more
+digits, followed by a period, and ending with a 0.</p>
+<p>The second handy switch is a <code>--sort=version:refname</code> which will sort
+the tags such that <code>v2.19</code> comes after <code>v2.2</code>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">git_tag</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="s2">&quot;git&quot;</span><span class="p">,</span> <span class="s2">&quot;tag&quot;</span><span class="p">,</span> <span class="s2">&quot;--list&quot;</span><span class="p">,</span> <span class="s1">&#39;v[0-9].[0-9]*.0&#39;</span><span class="p">,</span>
+        <span class="s2">&quot;--sort=version:refname&quot;</span>
+    <span class="p">],</span>
+    <span class="n">cwd</span><span class="o">=</span><span class="n">git_repo</span><span class="p">,</span>
+    <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+    <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="c1"># this call mysteriously adds a blank line at the end</span>
+<span class="c1"># which we remove by taking everything except for</span>
+<span class="c1"># the last element</span>
+<span class="n">tags</span> <span class="o">=</span> <span class="n">git_tag</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">tags</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[&#39;v1.0.0&#39;, &#39;v1.1.0&#39;, &#39;v1.2.0&#39;, &#39;v1.3.0&#39;, &#39;v1.4.0&#39;, &#39;v1.5.0&#39;, &#39;v1.6.0&#39;, &#39;v1.7.0&#39;, &#39;v1.8.0&#39;, &#39;v1.9.0&#39;, &#39;v2.0.0&#39;, &#39;v2.1.0&#39;, &#39;v2.2.0&#39;, &#39;v2.3.0&#39;, &#39;v2.4.0&#39;, &#39;v2.5.0&#39;, &#39;v2.6.0&#39;, &#39;v2.7.0&#39;, &#39;v2.8.0&#39;, &#39;v2.9.0&#39;, &#39;v2.10.0&#39;, &#39;v2.11.0&#39;, &#39;v2.12.0&#39;, &#39;v2.13.0&#39;, &#39;v2.14.0&#39;, &#39;v2.15.0&#39;, &#39;v2.16.0&#39;, &#39;v2.17.0&#39;, &#39;v2.18.0&#39;, &#39;v2.19.0&#39;, &#39;v2.20.0&#39;, &#39;v2.21.0&#39;, &#39;v2.22.0&#39;, &#39;v2.23.0&#39;, &#39;v2.24.0&#39;, &#39;v2.25.0&#39;, &#39;v2.26.0&#39;, &#39;v2.27.0&#39;, &#39;v2.28.0&#39;, &#39;v2.29.0&#39;]
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now that we've got all versions captured in order, let's run tokei
+over v1.0.0 and see what git looked like at the time.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+    <span class="p">[</span><span class="s2">&quot;git&quot;</span><span class="p">,</span> <span class="s2">&quot;checkout&quot;</span><span class="p">,</span> <span class="n">tags</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+    <span class="n">cwd</span><span class="o">=</span><span class="n">git_repo</span><span class="p">,</span>
+    <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
+    <span class="n">check</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+<span class="n">tokei</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+    <span class="p">[</span><span class="s2">&quot;tokei&quot;</span><span class="p">],</span>
+    <span class="n">cwd</span><span class="o">=</span><span class="n">git_repo</span><span class="p">,</span>
+    <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+    <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">tokei</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>===============================================================================
+ Language            Files        Lines         Code     Comments       Blanks
+===============================================================================
+ GNU Style Assembly      2          369          274           48           47
+ Autoconf                1          188          152            2           34
+ C                     111        32617        26384         2664         3569
+ C Header               25         1424          948          219          257
+ Makefile                4          687          451          116          120
+ Perl                    1           69           60            1            8
+ Python                  3         2333         2035           80          218
+ Shell                 107        16366        13595         1163         1608
+ Plain Text            127        13434            0        10313         3121
+===============================================================================
+ Total                 381        67487        43899        14606         8982
+===============================================================================
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>26,000 lines of C and nearly 15,000 lines of shell scripts are
+nothing to sneeze at, but let's look again at the statistics
+of git today.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+    <span class="p">[</span><span class="s2">&quot;git&quot;</span><span class="p">,</span> <span class="s2">&quot;checkout&quot;</span><span class="p">,</span> <span class="n">tags</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]],</span>
+    <span class="n">cwd</span><span class="o">=</span><span class="n">git_repo</span><span class="p">,</span>
+    <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
+    <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">tokei</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+    <span class="p">[</span><span class="s2">&quot;tokei&quot;</span><span class="p">],</span>
+    <span class="n">cwd</span><span class="o">=</span><span class="n">git_repo</span><span class="p">,</span>
+    <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+    <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">tokei</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>===============================================================================
+ Language            Files        Lines         Code     Comments       Blanks
+===============================================================================
+ ASP.NET                 9         1083          942            0          141
+ GNU Style Assembly      1          224           98          100           26
+ Autoconf                9          128          108            3           17
+ BASH                    1         3585         2866          431          288
+ Batch                   3          287          117          118           52
+ C                     475       284504       220346        29119        35039
+ C Header              228        36873        18580        13629         4664
+ CMake                   1          988          779           50          159
+ CSS                     2          982          783           30          169
+ Emacs Lisp              2           12           12            0            0
+ Go                      4          558          421           84           53
+ JavaScript              3         1065          513          411          141
+ Makefile               23         5191         3681          799          711
+ Markdown                4          347            0          262           85
+ Perl                   49        14057        11029         1183         1845
+ Python                  4         9116         7047          690         1379
+ ReStructuredText        6         1142          892            0          250
+ Ruby                    1           48           43            0            5
+ Shell                1127       261148       223343        11951        25854
+ TCL                     1           29           25            0            4
+ Plain Text            750       109999            0        86528        23471
+ XSL                     6           95           68           16           11
+ Zsh                     1          246          191           18           37
+===============================================================================
+ Total                2710       731707       491884       145422        94401
+===============================================================================
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>At 280,000 lines of C and 260,000 lines of shell scripts, git has
+grown to over ten times the size of its original release in 2005!</p>
+<p>Finally, let's use <a href="https://seaborn.pydata.org/">seaborn</a> to visualize
+git's growth over time. We'll check out each version one by one, run
+<code>tokei --output json</code>, and store the number of lines of C code in each
+version.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">line_lens</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">:</span>
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+        <span class="p">[</span><span class="s2">&quot;git&quot;</span><span class="p">,</span> <span class="s2">&quot;checkout&quot;</span><span class="p">,</span> <span class="n">tag</span><span class="p">],</span>
+        <span class="n">cwd</span><span class="o">=</span><span class="n">git_repo</span><span class="p">,</span>
+        <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">tokei</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+        <span class="p">[</span><span class="s2">&quot;tokei&quot;</span><span class="p">,</span> <span class="s2">&quot;--output&quot;</span><span class="p">,</span> <span class="s2">&quot;json&quot;</span><span class="p">],</span>
+        <span class="n">cwd</span><span class="o">=</span><span class="n">git_repo</span><span class="p">,</span>
+        <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+        <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span>
+    <span class="p">)</span>
+    <span class="n">tokei_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">tokei</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+    <span class="n">c_lines</span> <span class="o">=</span> <span class="n">tokei_json</span><span class="p">[</span><span class="s2">&quot;C&quot;</span><span class="p">][</span><span class="s2">&quot;code&quot;</span><span class="p">]</span>
+    <span class="n">line_lens</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c_lines</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We'll plot the tags on the x-axis (only displaying every 5th tag
+for space) and the number of lines of C code on the y-axis to see
+the rate at which git's codebase has grown by version.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">plt</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">tags</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">line_lens</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">()):</span>
+    <span class="k">if</span> <span class="n">ind</span> <span class="o">%</span> <span class="mi">5</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># every 5th label is kept</span>
+        <span class="n">label</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">label</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,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
+"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+ 
+
+
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: 'center'," +
+        "    displayIndent: '0em'," +
+        "    showMathMenu: true," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['$','$'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        " linebreaks: { automatic: true, width: '95% container' }, " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }" +
+        "    } " +
+        "}); ";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+        </div>
+
+        <div class="meta">
+            <div>
+                    <a href="https://kylekizirian.github.io/tag/git.html" class="tag">git</a>
+                    <a href="https://kylekizirian.github.io/tag/tokei.html" class="tag">tokei</a>
+            </div>
+        </div>
+    </article>
+
+
+</div>
+
+<style type="text/css">
+{
+    max-width: 700px;
+}
+
+.text_cell .prompt {
+    display: none;
+}
+
+div.cell {
+    padding: 0;
+}
+
+div.text_cell_render {
+    padding: 0;
+}
+
+div.prompt {
+    font-size: 13px;
+}
+
+div.input_prompt {
+    padding: .7em 0.2em;
+}
+
+div.output_prompt {
+    padding: .4em .2em;
+}
+
+div.input_area {
+    margin: .2em 0.4em;
+    max-width: 580px;
+}
+
+table.dataframe {
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    line-height: 20px;
+}
+
+table.dataframe th, td {
+    padding: 4px;
+    text-align: left;
+}
+
+pre code {
+    background-color: inherit;
+}</style>
+
+        </div>
+<!--
+    <footer>
+      <p>
+        © 2012-2017 Kyle Kizirian, license <a href=""> </a>
+        unless otherwise noted.
+        Generated by <a href= "http://docs.getpelican.com/">Pelican</a>.
+      </p>
+    </footer>
+-->
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-158782319-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-158782319-1');
+    ga('send', 'pageview');
+</script>
+    </body>
+</html>
