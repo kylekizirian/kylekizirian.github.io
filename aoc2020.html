@@ -2205,7 +2205,7 @@ of those.</p>
 <span class="k">for</span> <span class="n">cur_index</span><span class="p">,</span> <span class="n">cur_element</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">elements</span><span class="p">):</span>
     <span class="c1"># look backwards at the subproblems that have already</span>
     <span class="c1"># been solved</span>
-    <span class="k">for</span> <span class="n">prev_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cur_index</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">prev_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cur_index</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
         <span class="n">prev_element</span> <span class="o">=</span> <span class="n">elements</span><span class="p">[</span><span class="n">prev_index</span><span class="p">]</span>
 
         <span class="c1"># because the elements are in sorted order, when</span>
@@ -2236,7 +2236,7 @@ of those.</p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>[2, 2, 4, 6, 10, 16, 26, 42, 68, 110, 178]</pre>
+<pre>[1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89]</pre>
 </div>
 
 </div>
