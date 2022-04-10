@@ -6,7 +6,7 @@
         <meta name="author" content="Kyle Kizirian">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
-        <title>Time-slicing applications with SIGCONT and SIGSTOP | Kizirian</title>
+        <title>Mergesort, quicksort, and fuzz testing in Go | Kizirian</title>
 
 	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 	<link rel="icon" href="/favicon.ico" type="image/x-icon">
@@ -406,8 +406,8 @@ article .meta a.comments_btn:hover {
 <div class="container post">
     <article>
         <header>
-            <h1>Time-slicing applications with SIGCONT and SIGSTOP</h1>
-            <time datetime="article.date.isoformat()" pubdate>Sun 15 March 2020</time>
+            <h1>Mergesort, quicksort, and fuzz testing in Go</h1>
+            <time datetime="article.date.isoformat()" pubdate>Sun 10 April 2022</time>
         </header>
 
         <div class="article_content">
@@ -1525,310 +1525,178 @@ h6:hover .anchor-link {
 .highlight .il { color: #666666 } /* Literal.Number.Integer.Long */</style><div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Python's
-<a href="https://docs.python.org/3/library/subprocess.html#popen-objects">subprocess.Popen</a>
-class and <a href="https://docs.python.org/3/library/signal.html">signal</a>
-library provide powerful ways to
-<a href="https://docs.python.org/3/library/subprocess.html#subprocess.Popen.communicate">communicate with</a>
-and
-<a href="https://docs.python.org/3/library/subprocess.html#subprocess.Popen.send_signal">send signals to</a>
-a running subprocess.</p>
-<p>We'll look at at using the
-<a href="https://manpages.debian.org/buster/manpages/signal.7.en.html#Standard_signals">SIGSTOP and SIGCONT signals</a>
-to pause and resume the execution of a program. As an example,
-we'll launch another Python process that runs a <code>print_time</code> script.
-The <code>print_time</code> script takes two arguments, a time delta $n$ and a
-total time $t$. The script prints its process ID and the Unix time every
-$n$ seconds and completes after $t$ seconds.</p>
-<p>The <code>print_time</code> script looks like</p>
-<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">time</span>
+<p>I'm thrilled by go 1.18's addition of <a href="https://go.dev/doc/fuzz/">fuzz testing</a>
+and wanted to play around with implementing and fuzz testing a few sorting
+algorithms.</p>
+<p>Let's start with a classic recursive implementation of mergesort. Recursive
+mergesort works by spliting the slice into halves until we're left with a
+slice of length 0 or 1 which, by definition, is sorted. It then recursively
+merges the two sorted halves by taking the smaller element from
+the start of the two slices and calling merge on the remaining elements.</p>
+<p>Let's start with the recursive merge of two sorted slices.</p>
+<div class="highlight"><pre><span></span><span class="kd">func</span> <span class="nx">mergeRecursive</span><span class="p">(</span><span class="nx">first</span><span class="p">,</span> <span class="nx">second</span> <span class="p">[]</span><span class="kt">int</span><span class="p">)</span> <span class="p">[]</span><span class="kt">int</span> <span class="p">{</span>
+    <span class="c1">// if the length of either slice is 0, there is</span>
+    <span class="c1">// no merging to be done</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">first</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">second</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">second</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">first</span>
+    <span class="p">}</span>
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-
-    <span class="n">sleep_time</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
-    <span class="n">run_time</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-    <span class="n">end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="n">run_time</span>
-
-    <span class="k">while</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">end_time</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;{os.getpid()}: {time.time()}&quot;</span><span class="p">)</span>
-        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">sleep_time</span><span class="p">)</span>
+    <span class="c1">// take the smaller 0th element and return this element</span>
+    <span class="c1">// followed by the result of merging all remaining elements</span>
+    <span class="k">if</span> <span class="nx">first</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">&lt;</span> <span class="nx">second</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nb">append</span><span class="p">([]</span><span class="kt">int</span><span class="p">{</span><span class="nx">first</span><span class="p">[</span><span class="mi">0</span><span class="p">]},</span> <span class="nx">mergeRecursive</span><span class="p">(</span><span class="nx">first</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="nx">second</span><span class="p">)</span><span class="o">...</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="nb">append</span><span class="p">([]</span><span class="kt">int</span><span class="p">{</span><span class="nx">second</span><span class="p">[</span><span class="mi">0</span><span class="p">]},</span> <span class="nx">mergeRecursive</span><span class="p">(</span><span class="nx">first</span><span class="p">,</span> <span class="nx">second</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span><span class="o">...</span><span class="p">)</span>
+<span class="p">}</span>
 </pre></div>
-<p>Even though we're running other Python processes in this example, the
-concept of using signals applies to any program. The same script
-could've been implemented in any language or even with a mix of bash and
-Unix programs.</p>
+<p>With this, the actual mergesort implementation is quite simple.</p>
+<div class="highlight"><pre><span></span><span class="kd">func</span> <span class="nx">MergesortRecursive</span><span class="p">(</span><span class="nx">vals</span> <span class="p">[]</span><span class="kt">int</span><span class="p">)</span> <span class="p">[]</span><span class="kt">int</span> <span class="p">{</span>
+    <span class="c1">// if the length of vals is 0 or 1, then there&#39;s no</span>
+    <span class="c1">// work to be done</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">vals</span><span class="p">)</span> <span class="p">&lt;</span> <span class="mi">2</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">vals</span>
+    <span class="p">}</span>
 
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[1]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">signal</span>
-<span class="kn">from</span> <span class="nn">subprocess</span> <span class="k">import</span> <span class="n">Popen</span><span class="p">,</span> <span class="n">PIPE</span>
-<span class="kn">import</span> <span class="nn">time</span>
+    <span class="c1">// recursively sort the two halves of the arrayk</span>
+    <span class="c1">// and merge the results together</span>
+    <span class="nx">first</span> <span class="o">:=</span> <span class="nx">MergesortRecursive</span><span class="p">(</span><span class="nx">vals</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="nx">vals</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">])</span>
+    <span class="nx">second</span> <span class="o">:=</span> <span class="nx">MergesortRecursive</span><span class="p">(</span><span class="nx">vals</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="nx">vals</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">:])</span>
+    <span class="k">return</span> <span class="nx">mergeRecursive</span><span class="p">(</span><span class="nx">first</span><span class="p">,</span> <span class="nx">second</span><span class="p">)</span>
+<span class="p">}</span>
 </pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>A few notes about the <code>Popen</code> class which launches a running
-subprocess. The first argument is a list of strings containing the
-program to run and its arguments. This line</p>
-<div class="highlight"><pre><span></span><span class="n">Popen</span><span class="p">([</span><span class="s2">&quot;python&quot;</span><span class="p">,</span> <span class="s2">&quot;print_time.py&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span> <span class="s2">&quot;5&quot;</span><span class="p">])</span>
+<p>Voila! Let's look at an iterative mergesort next. We start again with the
+merging function. We'll merge the two sorted slices by keeping a pointer
+into each slice and comparing the elements at each pointer, choosing the
+smaller element and appending it to the merged slice. We repeat this
+until we've reached the end of one of the slices.</p>
+<div class="highlight"><pre><span></span><span class="kd">func</span> <span class="nx">mergeIterative</span><span class="p">(</span><span class="nx">first</span><span class="p">,</span> <span class="nx">second</span> <span class="p">[]</span><span class="kt">int</span><span class="p">)</span> <span class="p">[]</span><span class="kt">int</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">firstIter</span><span class="p">,</span> <span class="nx">secondIter</span> <span class="kt">int</span>
+    <span class="nx">merged</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">int</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nx">first</span><span class="p">)</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="nx">second</span><span class="p">))</span>
+    <span class="k">for</span> <span class="nx">firstIter</span> <span class="p">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="nx">first</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">secondIter</span> <span class="p">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="nx">second</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="nx">first</span><span class="p">[</span><span class="nx">firstIter</span><span class="p">]</span> <span class="p">&lt;</span> <span class="nx">second</span><span class="p">[</span><span class="nx">secondIter</span><span class="p">]</span> <span class="p">{</span>
+            <span class="nx">merged</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">merged</span><span class="p">,</span> <span class="nx">first</span><span class="p">[</span><span class="nx">firstIter</span><span class="p">])</span>
+            <span class="nx">firstIter</span><span class="o">++</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="nx">merged</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">merged</span><span class="p">,</span> <span class="nx">second</span><span class="p">[</span><span class="nx">secondIter</span><span class="p">])</span>
+            <span class="nx">secondIter</span><span class="o">++</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="nx">firstIter</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nx">first</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nb">append</span><span class="p">(</span><span class="nx">merged</span><span class="p">,</span> <span class="nx">second</span><span class="p">[</span><span class="nx">secondIter</span><span class="p">:]</span><span class="o">...</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="nb">append</span><span class="p">(</span><span class="nx">merged</span><span class="p">,</span> <span class="nx">first</span><span class="p">[</span><span class="nx">firstIter</span><span class="p">:]</span><span class="o">...</span><span class="p">)</span>
+<span class="p">}</span>
 </pre></div>
-<p>Is equivalent to opening your terminal and running</p>
-<div class="highlight"><pre><span></span>python print_time.py <span class="m">1</span> <span class="m">5</span>
+<p>Next, we come to our iterative mergesort implementation which is quite
+interesting. It resembles the recursive solution, in that we break the
+array up into slices of length 1 and merge two at a time until we are
+left with a single, sorted slice. Instead of recursively splitting the
+slice into halves, we'll put each element into a queue as a slice of
+length 1, pop off two slices a time, merge them, and enqueue the merged
+slice. We repeat this until we're left with a single slice.</p>
+<div class="highlight"><pre><span></span><span class="kd">func</span> <span class="nx">MergesortIterative</span><span class="p">(</span><span class="nx">vals</span> <span class="p">[]</span><span class="kt">int</span><span class="p">)</span> <span class="p">[]</span><span class="kt">int</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">vals</span><span class="p">)</span> <span class="p">&lt;</span> <span class="mi">2</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">vals</span>
+    <span class="p">}</span>
+
+    <span class="nx">queue</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([][]</span><span class="kt">int</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nx">vals</span><span class="p">))</span>
+    <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">vals</span> <span class="p">{</span>
+        <span class="nx">queue</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="p">=</span> <span class="p">[]</span><span class="kt">int</span><span class="p">{</span><span class="nx">vals</span><span class="p">[</span><span class="nx">i</span><span class="p">]}</span>
+    <span class="p">}</span>
+
+    <span class="k">for</span> <span class="nb">len</span><span class="p">(</span><span class="nx">queue</span><span class="p">)</span> <span class="p">&gt;</span> <span class="mi">1</span> <span class="p">{</span>
+        <span class="c1">// pop off two, merge and enqueue</span>
+        <span class="nx">queue</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">queue</span><span class="p">,</span> <span class="nx">mergeIterative</span><span class="p">(</span><span class="nx">queue</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nx">queue</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="nx">queue</span> <span class="p">=</span> <span class="nx">queue</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="nx">queue</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="p">}</span>
 </pre></div>
-<p>The subprocess will begin running as soon as a <code>Popen</code> object is
-constructed and the <code>Popen.wait()</code> method will wait for the subprocess
-to terminate.</p>
-<p>The <code>stdout</code> argument sets where the process's output will be
-written. By using <code>subprocess.PIPE</code>, it will be written to the
-<code>Popen.stdout</code> attribute which can be read like a file. The <code>encoding</code>
-argument sets <code>stdout</code> to be interpreted as a stream of text rather
-than a stream of bytes.</p>
-<p>In the example below, we'll run the <code>print_time</code> program for five seconds
-with the Unix time printed at one second intervals. Two seconds in, we'll
-use the <code>SIGSTOP</code> signal to pause the program's execution and then resume
-it two seconds later with the <code>SIGCONT</code> signal.</p>
+<p>That's it! Now to verify our implementations. Fuzz testing is
+extremely powerful because it can generate far more test inputs
+than a human would be able to write. The tricky part is verifying that 
+the output of our fuzz test is correct, given that we don't know the
+inputs.</p>
+<p>Rather than verifying that our output is a specific value, we can verify 
+properties of our output. We're fortunate that this is easy for sorting
+functions, because we can use the standard library's
+<a href="https://pkg.go.dev/sort#IntsAreSorted">sort.IntsAreSorted</a> to verify
+that our output is sorted. We can also verify that our output has the
+same length as our input, to ensure we haven't lost or added any
+elements in our sort implementation.</p>
+<p>We expect that our two mergesort implementations function identically,
+so we can write a <code>fuzzTest</code> function that will be used to test both.
+Our <code>fuzzTest</code> function will take a sorting function as an argument,
+allowing us to pass <code>MergesortRecursive</code> and <code>MergesortIterative</code> to
+it, to easily test both.</p>
+<div class="highlight"><pre><span></span><span class="kd">func</span> <span class="nx">fuzzSort</span><span class="p">(</span><span class="nx">f</span> <span class="o">*</span><span class="nx">testing</span><span class="p">.</span><span class="nx">F</span><span class="p">,</span> <span class="nx">sortFunc</span> <span class="kd">func</span><span class="p">([]</span><span class="kt">int</span><span class="p">)</span> <span class="p">[]</span><span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// add a simple seed corpus</span>
+    <span class="nx">f</span><span class="p">.</span><span class="nx">Add</span><span class="p">([]</span><span class="kt">byte</span><span class="p">{</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">})</span>
+    <span class="nx">f</span><span class="p">.</span><span class="nx">Fuzz</span><span class="p">(</span><span class="kd">func</span><span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">testing</span><span class="p">.</span><span class="nx">T</span><span class="p">,</span> <span class="nx">b</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// fuzzing only supports byte slice arguments, so we</span>
+        <span class="c1">// convert to an int slice here</span>
+        <span class="nx">vals</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">int</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nx">b</span><span class="p">))</span>
+        <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">b</span> <span class="p">{</span>
+            <span class="nx">vals</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="p">=</span> <span class="nb">int</span><span class="p">(</span><span class="nx">b</span><span class="p">[</span><span class="nx">i</span><span class="p">])</span>
+        <span class="p">}</span>
 
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[2]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">p</span> <span class="o">=</span> <span class="n">Popen</span><span class="p">([</span><span class="s2">&quot;python&quot;</span><span class="p">,</span> <span class="s2">&quot;print_time.py&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;5&quot;</span><span class="p">],</span> <span class="n">stdout</span><span class="o">=</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
-<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">p</span><span class="o">.</span><span class="n">send_signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGSTOP</span><span class="p">)</span>
-<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">p</span><span class="o">.</span><span class="n">send_signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGCONT</span><span class="p">)</span>
-<span class="n">p</span><span class="o">.</span><span class="n">wait</span><span class="p">();</span>  <span class="c1"># Semi-colon is so the output of p.wait() is not printed</span>
+        <span class="nx">sortedVals</span> <span class="o">:=</span> <span class="nx">sortFunc</span><span class="p">(</span><span class="nx">vals</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">!</span><span class="nx">sort</span><span class="p">.</span><span class="nx">IntsAreSorted</span><span class="p">(</span><span class="nx">sortedVals</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">t</span><span class="p">.</span><span class="nx">Errorf</span><span class="p">(</span><span class="s">&quot;result is not sorted: %v&quot;</span><span class="p">,</span> <span class="nx">sortedVals</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">vals</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="nx">sortedVals</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">t</span><span class="p">.</span><span class="nx">Errorf</span><span class="p">(</span><span class="s">&quot;input and output should have same # of elements&quot;</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">})</span>
+<span class="p">}</span>
 </pre></div>
+<p>Our flexible <code>fuzzSort</code> function makes it very simple to add fuzz
+tests for both <code>MergesortRecursive</code> and <code>MergesortIterative</code>.</p>
+<div class="highlight"><pre><span></span><span class="kd">func</span> <span class="nx">FuzzMergesortRecursive</span><span class="p">(</span><span class="nx">f</span> <span class="o">*</span><span class="nx">testing</span><span class="p">.</span><span class="nx">F</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">fuzzSort</span><span class="p">(</span><span class="nx">f</span><span class="p">,</span> <span class="nx">MergesortRecursive</span><span class="p">)</span>
+<span class="p">}</span>
 
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Note in the output below that the program runs for two seconds,
-pauses for a two second gap, then runs for two more seconds.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[3]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">readlines</span><span class="p">():</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+<span class="kd">func</span> <span class="nx">FuzzMergesortIterative</span><span class="p">(</span><span class="nx">f</span> <span class="o">*</span><span class="nx">testing</span><span class="p">.</span><span class="nx">F</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">fuzzSort</span><span class="p">(</span><span class="nx">f</span><span class="p">,</span> <span class="nx">MergesortIterative</span><span class="p">)</span>
+<span class="p">}</span>
 </pre></div>
+<p>Now we have test coverage for both functions when we run <code>go test</code>!</p>
+<p>Let's add one more classic sorting function, quicksort. Quicksort
+works by choosing a random pivot value in the slice to be sorted.
+It then partitions the slice into elements less than the pivot,
+equal to the pivot, and greater than the pivot. It recursively
+sorts the slices less than and greater than the pivot, and combines
+all of the resulting sorted slices.</p>
+<div class="highlight"><pre><span></span><span class="kd">func</span> <span class="nx">Quicksort</span><span class="p">(</span><span class="nx">vals</span> <span class="p">[]</span><span class="kt">int</span><span class="p">)</span> <span class="p">[]</span><span class="kt">int</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">vals</span><span class="p">)</span> <span class="p">&lt;</span> <span class="mi">2</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">vals</span>
+    <span class="p">}</span>
 
-    </div>
-</div>
-</div>
+    <span class="nx">pivot</span> <span class="o">:=</span> <span class="nx">vals</span><span class="p">[</span><span class="nx">rand</span><span class="p">.</span><span class="nx">Intn</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nx">vals</span><span class="p">))]</span>
+    <span class="kd">var</span> <span class="nx">lt</span><span class="p">,</span> <span class="nx">eq</span><span class="p">,</span> <span class="nx">gt</span> <span class="p">[]</span><span class="kt">int</span>
 
-<div class="output_wrapper">
-<div class="output">
+    <span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">val</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">vals</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="nx">val</span> <span class="p">&lt;</span> <span class="nx">pivot</span> <span class="p">{</span>
+            <span class="nx">lt</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">lt</span><span class="p">,</span> <span class="nx">val</span><span class="p">)</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="nx">val</span> <span class="p">&gt;</span> <span class="nx">pivot</span> <span class="p">{</span>
+            <span class="nx">gt</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">gt</span><span class="p">,</span> <span class="nx">val</span><span class="p">)</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="nx">eq</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">eq</span><span class="p">,</span> <span class="nx">val</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
 
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>1416: 1584328282.3045828
-1416: 1584328283.304825
-1416: 1584328286.266311
-1416: 1584328287.269263
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>For a more involved example, we'll launch three processes
-running <code>print_time</code> and stop all of them immediately. We'll then
-use <code>SIGSTOP</code> and <code>SIGCONT</code> to allow each of them to run one at a
-time in round-robin fashion until they've all exited. This functions
-like a time-slicing mechanism in which each program gets equal
-execution time and none of the programs run concurrently.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[4]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">processes</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="n">Popen</span><span class="p">([</span><span class="s2">&quot;python&quot;</span><span class="p">,</span> <span class="s2">&quot;print_time.py&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;7&quot;</span><span class="p">],</span> <span class="n">stdout</span><span class="o">=</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-<span class="p">]</span>
-<span class="k">for</span> <span class="n">process</span> <span class="ow">in</span> <span class="n">processes</span><span class="p">:</span>
-    <span class="n">process</span><span class="o">.</span><span class="n">send_signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGSTOP</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">append</span><span class="p">(</span><span class="nb">append</span><span class="p">(</span><span class="nx">Quicksort</span><span class="p">(</span><span class="nx">lt</span><span class="p">),</span> <span class="nx">eq</span><span class="o">...</span><span class="p">),</span> <span class="nx">Quicksort</span><span class="p">(</span><span class="nx">gt</span><span class="p">)</span><span class="o">...</span><span class="p">)</span>
+<span class="p">}</span>
 </pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>The <code>Popen.poll()</code> method returns <code>None</code> if a process is still
-running. We'll use this to check whether any of the processes
-are still running and, if so, continue to run each process
-one-by-one.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[5]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">while</span> <span class="nb">any</span><span class="p">(</span><span class="n">process</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">process</span> <span class="ow">in</span> <span class="n">processes</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">process</span> <span class="ow">in</span> <span class="n">processes</span><span class="p">:</span>
-        <span class="n">process</span><span class="o">.</span><span class="n">send_signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGCONT</span><span class="p">)</span>
-        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-        <span class="n">process</span><span class="o">.</span><span class="n">send_signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGSTOP</span><span class="p">)</span>
+<p>Given our flexible <code>fuzzSort</code>, it's super simple to add a test case
+for <code>Quicksort</code>.</p>
+<div class="highlight"><pre><span></span><span class="kd">func</span> <span class="nx">FuzzQuicksort</span><span class="p">(</span><span class="nx">f</span> <span class="o">*</span><span class="nx">testing</span><span class="p">.</span><span class="nx">F</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">fuzzSort</span><span class="p">(</span><span class="nx">f</span><span class="p">,</span> <span class="nx">Quicksort</span><span class="p">)</span>
+<span class="p">}</span>
 </pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>To see how the processes ran in a non-overlapping fashion, we can
-combine the output of each process into one list and then sort
-the list by the printed Unix time value. This will reconstruct
-which process was running at each timestamp.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[6]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">lines</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">process</span> <span class="ow">in</span> <span class="n">processes</span>
-    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">process</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
-<span class="p">]</span>
-<span class="n">lines</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">line</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>In the output below, you can see each process run for two seconds before
-switching to a different process.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[7]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">))</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>1417: 1584328288.389765
-1417: 1584328289.389979
-1418: 1584328290.388866
-1418: 1584328291.3892632
-1419: 1584328292.398747
-1419: 1584328293.4039948
-1417: 1584328294.359136
-1417: 1584328295.3628201
-1418: 1584328296.361504
-1418: 1584328297.3635771
-1419: 1584328298.366812
-1419: 1584328299.372034
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Parting-thoughts">Parting thoughts<a class="anchor-link" href="#Parting-thoughts">&#182;</a></h2><p>The example above does, in a very rough way, what
-an <a href="https://en.wikipedia.org/wiki/ARINC_653">ARINC 653</a>
-operating system does in partitioning applications by time.</p>
-<p>A fun exercise would be to write a program that takes a config file
-containing programs with a time-slice allocation and coordinates
-their execution. It would be interesting to come up with techniques
-for precise timing control and measuring how well the OS and Python
-interpreter are able to switch between the running programs.</p>
-<p>My idea for this came while watching
-<a href="https://missing.csail.mit.edu/2020/command-line/">this command-line environment</a>
-lecture which does a great job giving an overview of signals and a
-number of other things. The entire
-<a href="https://missing.csail.mit.edu/">Missing Semester lecture series</a> is
-really fantastic and something that I wish I'd taken a college course on. I
-found the lectures on
-<a href="https://missing.csail.mit.edu/2020/editors/">editors</a>,
-<a href="https://missing.csail.mit.edu/2020/data-wrangling/">data wrangling</a>,
-and <a href="https://missing.csail.mit.edu/2020/version-control/">version control</a>
-to be particularly useful.</p>
 
 </div>
 </div>
@@ -1869,7 +1737,8 @@ to be particularly useful.</p>
 
         <div class="meta">
             <div>
-                    <a href="https://kylekizirian.github.io/tag/python.html" class="tag">python</a>
+                    <a href="https://kylekizirian.github.io/tag/go.html" class="tag">go</a>
+                    <a href="https://kylekizirian.github.io/tag/algorithms.html" class="tag">algorithms</a>
             </div>
         </div>
     </article>
