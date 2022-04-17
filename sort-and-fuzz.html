@@ -379,6 +379,7 @@ article .meta a.comments_btn:hover {
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="js/fs.js"></script>
 
 
     </head>
@@ -1559,7 +1560,7 @@ the start of the two slices and calling merge on the remaining elements.</p>
         <span class="k">return</span> <span class="nx">vals</span>
     <span class="p">}</span>
 
-    <span class="c1">// recursively sort the two halves of the arrayk</span>
+    <span class="c1">// recursively sort the two halves of the slice</span>
     <span class="c1">// and merge the results together</span>
     <span class="nx">first</span> <span class="o">:=</span> <span class="nx">MergesortRecursive</span><span class="p">(</span><span class="nx">vals</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="nx">vals</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">])</span>
     <span class="nx">second</span> <span class="o">:=</span> <span class="nx">MergesortRecursive</span><span class="p">(</span><span class="nx">vals</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="nx">vals</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">:])</span>
